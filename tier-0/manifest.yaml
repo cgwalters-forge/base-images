@@ -21,6 +21,7 @@ include:
   - ostree.yaml
   - initramfs.yaml
   - basic-fixes.yaml
+  - kernel-install.yaml
 
 packages:
   # this is implied by dependencies but let's make it explicit

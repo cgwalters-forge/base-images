@@ -26,7 +26,7 @@
 FROM quay.io/fedora/fedora:rawhide as repos
 
 # BOOTSTRAPPING: This can be any image that has rpm-ostree and selinux-policy-targeted.
-FROM quay.io/fedora/fedora:41 as builder
+FROM quay.io/fedora/fedora:rawhide as builder
 RUN dnf -y install rpm-ostree selinux-policy-targeted
 ARG MANIFEST=fedora-bootc.yaml
 COPY --from=repos /etc/dnf/vars /etc/dnf/vars
