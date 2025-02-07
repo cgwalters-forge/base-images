@@ -5,3 +5,5 @@ variables:
 packages:
   # https://gitlab.com/fedora/bootc/base-images/-/issues/12
   - fedora-repos-archive
+  # Not in RHEL10
+  - systemd-resolved
