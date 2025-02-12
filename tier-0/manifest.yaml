@@ -16,6 +16,7 @@ remove-from-packages:
 
 include:
   - postprocess-conf.yaml
+  - tmpfiles.yaml
   - bootc.yaml
   - bootupd.yaml
   - ostree.yaml
