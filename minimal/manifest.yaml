@@ -31,7 +31,7 @@ packages:
   # in dnf5. In CentOS/RHEL, this pulls in dnf(4). We can simplify this back to
   # just `dnf` once the `dnf` package is retired from Fedora.
   - /usr/bin/dnf
-  # Even in tier-0, we have this.  If you don't want SELinux today, you'll need
+  # Even in minimal, we have this.  If you don't want SELinux today, you'll need
   # to build a custom image.
   - selinux-policy-targeted
   # And we want container-selinux because trying to layer it on later currently causes issues.
