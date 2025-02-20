@@ -1,27 +1,10 @@
-# This container build uses some special features of podman that allow
-# a process executing as part of a container build to generate a new container
-# image "from scratch".
-#
-# This container build uses nested containerization, so you must build with e.g.
+# In order to make a base image as part of a Dockerfile, this container build uses
+# nested containerization, so you must build with e.g.
 # podman build --security-opt=label=disable --cap-add=all --device /dev/fuse <...>
-#
-# # Why are we doing this?
-#
-# Today this base image build process uses rpm-ostree.  There is a lot of things that
-# rpm-ostree does when generating a container image...but important parts include:
-#
-# - auto-updating labels in the container metadata
-# - Generating "chunked" content-addressed reproducible image layers (notice
-#   how there are ~60 layers in the generated image)
-#
-# The latter bit in particular is currently impossible to do from Containerfile.
-# A future goal is adding some support for this in a way that can be honored by
-# buildah (xref https://github.com/containers/podman/discussions/12605)
-#
-# # Why does this build process require additional privileges?
-#
-# Because it's generating a base image and uses containerization features itself.
-# In the future some of this can be lifted.
+
+# NOTE: This container build will output a single giant layer. It is strongly recommended
+# to run the "rechunker" on the output of this build, see 
+# https://coreos.github.io/rpm-ostree/experimental-build-chunked-oci/
 
 FROM quay.io/fedora/fedora:rawhide as repos
 
@@ -29,8 +12,6 @@ FROM quay.io/fedora/fedora:rawhide as repos
 FROM quay.io/fedora/fedora:rawhide as builder
 RUN dnf -y install rpm-ostree selinux-policy-targeted
 ARG MANIFEST=fedora-bootc.yaml
-COPY --from=repos /etc/dnf/vars /etc/dnf/vars
-COPY --from=repos /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-* /etc/pki/rpm-gpg
 # The input git repository has .repo files committed to git rpm-ostree has historically
 # emphasized that.  But here, we are fetching the repos from the container base image.
 # So copy the source, and delete the hardcoded ones in git, and use the container base
@@ -38,17 +19,20 @@ COPY --from=repos /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-* /etc/pki/rpm-gpg
 COPY . /src
 WORKDIR /src
 RUN rm -vf /src/*.repo
-COPY --from=repos /etc/yum.repos.d/*.repo /src
 RUN --mount=type=cache,target=/workdir \
-    --mount=type=bind,rw=true,src=.,dst=/buildcontext,bind-propagation=shared \
-    --mount=type=bind,from=repos,src=/,dst=/repos \
-      rpm-ostree compose image --image-config fedora-bootc-config.json \
-        --cachedir=/workdir --format=ociarchive --initialize ${MANIFEST} \
-       --source-root=/repos /buildcontext/out.ociarchive
+    --mount=type=bind,rw,from=repos,src=/,dst=/repos \
+    rpm-ostree experimental compose rootfs --cachedir=/workdir --source-root-rw=/repos ${MANIFEST} /target-rootfs
 
-FROM oci-archive:./out.ociarchive
-# Need to reference builder here to force ordering. But since we have to run
-# something anyway, we might as well cleanup after ourselves.
-RUN --mount=type=bind,from=builder,src=.,target=/var/tmp \
-    --mount=type=bind,rw=true,src=.,dst=/buildcontext,bind-propagation=shared \
-      rm /buildcontext/out.ociarchive
+# This pulls in the rootfs generated in the previous step
+FROM scratch
+COPY --from=builder /target-rootfs/ /
+LABEL containers.bootc 1
+# This is an ad-hoc way for us to reference bootc-image-builder in
+# a way that in theory client tooling can inspect and find. Today
+# it isn't widely used.
+LABEL bootc.diskimage-builder quay.io/centos-bootc/bootc-image-builder
+# https://pagure.io/fedora-kiwi-descriptions/pull-request/52
+ENV container=oci
+# Make systemd the default
+STOPSIGNAL SIGRTMIN+3
+CMD ["/sbin/init"]
