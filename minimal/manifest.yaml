@@ -15,6 +15,7 @@ remove-from-packages:
   - [systemd-udev, /usr/lib/systemd/system-generators/systemd-gpt-auto-generator]
 
 include:
+  - kernel.yaml
   - postprocess-conf.yaml
   - tmpfiles.yaml
   - bootc.yaml

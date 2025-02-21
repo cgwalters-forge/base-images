@@ -5,4 +5,3 @@ metadata:
 include:
   - fedora-generic.yaml
   - tier-1/manifest.yaml
-  - tier-1/kernel.yaml
