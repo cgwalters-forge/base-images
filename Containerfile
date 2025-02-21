@@ -11,7 +11,7 @@ FROM quay.io/fedora/fedora:rawhide as repos
 # BOOTSTRAPPING: This can be any image that has rpm-ostree and selinux-policy-targeted.
 FROM quay.io/fedora/fedora:rawhide as builder
 RUN dnf -y install rpm-ostree selinux-policy-targeted
-ARG MANIFEST=fedora-bootc.yaml
+ARG MANIFEST=fedora-standard
 # The input git repository has .repo files committed to git rpm-ostree has historically
 # emphasized that.  But here, we are fetching the repos from the container base image.
 # So copy the source, and delete the hardcoded ones in git, and use the container base
@@ -20,8 +20,17 @@ COPY . /src
 WORKDIR /src
 RUN rm -vf /src/*.repo
 RUN --mount=type=cache,target=/workdir \
-    --mount=type=bind,rw,from=repos,src=/,dst=/repos \
-    rpm-ostree experimental compose rootfs --cachedir=/workdir --source-root-rw=/repos ${MANIFEST} /target-rootfs
+    --mount=type=bind,rw,from=repos,src=/,dst=/repos <<EORUN
+set -xeuo pipefail
+# Put our manifests into the builder image in the same location they'll be in the
+# final image.
+./install-manifests
+# Verify that listing works
+/usr/libexec/bootc-base-imagectl list >/dev/null
+# Run the build script in the same way we expect custom images to do, and also
+# "re-inject" the manifests into the target, so secondary container builds can use it.
+/usr/libexec/bootc-base-imagectl build-rootfs --reinject --manifest=${MANIFEST} /repos /target-rootfs
+EORUN
 
 # This pulls in the rootfs generated in the previous step
 FROM scratch

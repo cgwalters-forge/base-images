@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+
+import os
+import os.path as path
+import subprocess
+import shutil
+import json
+import argparse
+import sys
+
+MANIFESTDIR = 'usr/share/doc/bootc-base-imagectl/manifests'
+
+def run_build_rootfs(args):
+    """
+    Regenerates a base image using a build configuration.
+    """
+    target = args.target
+    if os.path.isdir(args.manifest):
+        manifest_path = os.path.join(args.manifest, 'manifest.yaml')
+    else:
+        manifest_path = args.manifest + '.yaml'
+    try:
+        # Perform the build
+        subprocess.run([
+            'rpm-ostree',
+            'experimental',
+            'compose',
+            'rootfs',
+            f'--source-root-rw={args.source_root}',
+            f'/{MANIFESTDIR}/{manifest_path}',
+            target,
+        ], check=True)
+        # And run the bootc linter for good measure
+        subprocess.run([
+            'bootc',
+            'container',
+            'lint',
+            f'--rootfs={target}',
+        ], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing command: {e}")
+        sys.exit(1)
+
+    # Copy our own build configuration into the target if configured;
+    # this is used for the first stage build. But by default *secondary*
+    # builds don't get this.
+    if args.reinject:
+        for d in [MANIFESTDIR]:
+            dst = path.join(target, d)
+            print(f"Copying /{d} to {dst}")
+            shutil.copytree('/' + d, dst)
+        for f in ['usr/libexec/bootc-base-imagectl']:
+            dst = path.join(target, f)
+            print(f"Copying /{f} to {dst}")
+            shutil.copy('/' + f, dst)
+
+def run_list(args):
+    d = '/' + MANIFESTDIR
+    for ent in sorted(os.listdir(d)):
+        name, ext = os.path.splitext(ent)
+        if ext != '.yaml':
+            continue
+        fullpath = os.path.join(d, ent)
+        if os.path.islink(fullpath):
+            continue
+        o = subprocess.check_output(['rpm-ostree', 'compose', 'tree', '--print-only', fullpath])
+        manifest = json.loads(o)
+        description = manifest['metadata']['summary']
+        print(f"{name}: {description}")
+        print("---")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Operate on the build configuration for this container")
+    subparsers = parser.add_subparsers(help='Subcommands', required=True)
+
+    build_rootfs = subparsers.add_parser('build-rootfs', help='Generate a container root filesystem')
+    build_rootfs.add_argument("--reinject", help="Also reinject the build configurations into the target", action='store_true')
+    build_rootfs.add_argument("--manifest", help="Use the specified manifest", action='store', default='default')
+    build_rootfs.add_argument("source_root", help="Path to the source root directory used for dnf configuration.")
+    build_rootfs.add_argument("target", help="Path to the target root directory that will be generated.")
+    build_rootfs.set_defaults(func=run_build_rootfs)
+
+    cmd_list = subparsers.add_parser('list', help='List available manifests')
+    cmd_list.set_defaults(func=run_list)
+
+    args = parser.parse_args()
+    args.func(args)
