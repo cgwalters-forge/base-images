@@ -24,7 +24,7 @@ build-image:
   extends: .build-image
   parallel:
     matrix:
-      - TIER: [minimal, tier-1, tier-x]
+      - TIER: [minimal, standard, tier-x]
   variables:
     EXTRA_ARGS: "--security-opt=label=disable --cap-add=all --build-arg MANIFEST=fedora-$TIER.yaml"
   rules:

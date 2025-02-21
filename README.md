@@ -30,7 +30,7 @@ podman build --security-opt=label=disable --cap-add=all \
   --device /dev/fuse -t localhost/fedora-bootc .
 ```
 
-See the `Containerfile` for more details. This builds the default `tier-1` image.
+See the `Containerfile` for more details. This builds the default `standard` image.
 
 ## Fedora versions
 
@@ -58,7 +58,7 @@ It is planned to rework and improve this in the future, especially
 to support smaller custom images. For more on this, see
 [this tracker issue](https://gitlab.com/fedora/bootc/tracker/-/issues/32).
 
-- **tier-1**: This image is the default, what is published as
+- **standard**: This image is the default, what is published as
   https://quay.io/repository/fedora/fedora-bootc
 - **minimal**: This content set is more of a convenient centralization point for CI
   and curation around a package set that is intended as a starting point fror
@@ -69,7 +69,7 @@ to support smaller custom images. For more on this, see
   To build this, pass `--build-arg=MANIFEST=fedora-tier-x.yaml` to the build
   command above.
 
-**tier-1** inherits from **tier-x** and **tier-x** in turn inherit from **minimal**.
+**standard** inherits from **tier-x** and **tier-x** in turn inherit from **minimal**.
 
 All non-trivial changes to **minimal** and **tier-x** should be ACKed by at least
 one stakeholder of each Fedora variant WGs.
