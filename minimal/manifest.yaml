@@ -1,3 +1,6 @@
+metadata:
+  summary: Effectively just bootc, systemd, kernel, and dnf as a starting point.
+
 edition: "2024"
 
 # Be minimal

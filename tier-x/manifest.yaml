@@ -1,3 +1,11 @@
+metadata:
+  summary: |
+    A relatively full, but still generic base image. Roughly
+    similar to a smaller Fedora CoreOS. Includes NetworkManager,
+    openssh, various CLI tools, etc.
+    
+    Automatic updates are not on by default.
+
 include:
   - ../minimal/manifest.yaml
 
