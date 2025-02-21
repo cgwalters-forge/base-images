@@ -1,6 +1,24 @@
 ---
-include:
-  - remote: https://gitlab.com/platform-engineering-org/gitlab-ci/-/raw/main/templates/build-image.gitlab-ci.yml
+stages:
+  - build
+
+variables:
+  IMAGE: ${CI_REGISTRY}/${CI_PROJECT_PATH}:${CI_COMMIT_SHA}
+  CONTAINERFILE: Containerfile
+  CONTEXT: .
+  EXTRA_ARGS: ""
+
+.build-image:
+  stage: build
+  image: quay.io/buildah/stable:v1.38.0
+  needs: []
+  script: buildah bud -f ${CONTAINERFILE} --no-cache -t ${IMAGE} ${EXTRA_ARGS} ${CONTEXT}
+  rules:
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_PIPELINE_SOURCE == "push"
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
 
 build-image:
   extends: .build-image
