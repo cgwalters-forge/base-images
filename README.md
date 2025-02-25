@@ -30,7 +30,7 @@ podman build --security-opt=label=disable --cap-add=all \
   --device /dev/fuse -t localhost/fedora-bootc .
 ```
 
-See the `Containerfile` for more details. This builds the default `tier-1` image.
+See the `Containerfile` for more details. This builds the default `standard` image.
 
 ## Fedora versions
 
@@ -58,21 +58,20 @@ It is planned to rework and improve this in the future, especially
 to support smaller custom images. For more on this, see
 [this tracker issue](https://gitlab.com/fedora/bootc/tracker/-/issues/32).
 
-- **tier-1**: This image is the default, what is published as
+- **standard**: This image is the default, what is published as
   https://quay.io/repository/fedora/fedora-bootc
-- **tier-0**: This content set is more of a convenient centralization point for CI
-  and curation around a package set that we can all agree is the rough minimum
-  necessary for a usable system. It's not meant to be used as is, but layered
-  upon.
+- **minimal**: This content set is more of a convenient centralization point for CI
+  and curation around a package set that is intended as a starting point fror
+  a container base image.
 - **tier-x**: This content set is the shared base used by all image-based
   Fedora variants (IoT, Atomic Desktops, and CoreOS).
   Changes to this tier may be done without accounting for external users.
   To build this, pass `--build-arg=MANIFEST=fedora-tier-x.yaml` to the build
   command above.
 
-**tier-1** inherits from **tier-x** and **tier-x** in turn inherit from **tier-0**.
+**standard** inherits from **tier-x** and **tier-x** in turn inherit from **minimal**.
 
-All non-trivial changes to **tier-0** and **tier-x** should be ACKed by at least
+All non-trivial changes to **minimal** and **tier-x** should be ACKed by at least
 one stakeholder of each Fedora variant WGs.
 
 ## More information

@@ -1,3 +1,9 @@
+metadata:
+  summary: |
+    A relatively full, but still generic base image. Roughly
+    similar to a headless server installation. Automatic updates
+    are on by default.
+
 # Flip this back on, we're going to be a larger system
 recommends: true
 

@@ -1,8 +1,0 @@
-metadata:
-  name: fedora-boot-tier0
-  summary: Fedora Bootable Tier 0
-
-include:
-  - fedora-generic.yaml
-  - tier-0/manifest.yaml
-  - tier-0/kernel.yaml

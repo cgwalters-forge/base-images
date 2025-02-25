@@ -1,15 +1,23 @@
 ---
-include:
-  - remote: https://gitlab.com/platform-engineering-org/gitlab-ci/-/raw/main/templates/build-image.gitlab-ci.yml
+stages:
+  - build
 
-build-image:
+variables:
+  PRIV_ARGS: "--security-opt=label=disable --cap-add=all --device /dev/fuse"
+
+.build-image:
+  stage: build
+  image: quay.io/buildah/stable:v1.38.0
+  needs: []
+
+build-minimal:
   extends: .build-image
-  parallel:
-    matrix:
-      - TIER: [tier-0, tier-1, tier-x]
-  variables:
-    EXTRA_ARGS: "--security-opt=label=disable --cap-add=all --build-arg MANIFEST=fedora-$TIER.yaml"
-  rules:
-    - if: $CI_PROJECT_NAMESPACE != "fedora/bootc"
-      when: never
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script: buildah build -f Containerfile --no-cache -t localhost/fedora-bootc:minimal ${PRIV_ARGS} --build-arg=manifest=fedora-minimal .
+
+standard-build-and-test:
+  extends: .build-image
+  script: |
+    set -xeuo pipefail
+    buildah build --no-cache -t localhost/fedora-bootc ${PRIV_ARGS} .
+    cd tests
+    buildah build -f Containerfile.test-derive --no-cache -t localhost/fedora-bootc-derived ${PRIV_ARGS} .
