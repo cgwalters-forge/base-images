@@ -19,17 +19,17 @@ def run_build_rootfs(args):
         manifest_path = os.path.join(args.manifest, 'manifest.yaml')
     else:
         manifest_path = args.manifest + '.yaml'
+    rpmostree_argv = ['rpm-ostree', 'experimental', 'compose', 'rootfs']
     try:
+        # Assume we can mutate alternative roots
+        if args.source_root != '/':
+            rpmostree_argv.append(f'--source-root-rw={args.source_root}')
+        else:
+            # But we shouldn't need to mutate the default root
+            rpmostree_argv.append('--source-root=/')
+        rpmostree_argv.extend([f'/{MANIFESTDIR}/{manifest_path}', target])
         # Perform the build
-        subprocess.run([
-            'rpm-ostree',
-            'experimental',
-            'compose',
-            'rootfs',
-            f'--source-root-rw={args.source_root}',
-            f'/{MANIFESTDIR}/{manifest_path}',
-            target,
-        ], check=True)
+        subprocess.run(rpmostree_argv, check=True)
         # And run the bootc linter for good measure
         subprocess.run([
             'bootc',
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     build_rootfs = subparsers.add_parser('build-rootfs', help='Generate a container root filesystem')
     build_rootfs.add_argument("--reinject", help="Also reinject the build configurations into the target", action='store_true')
     build_rootfs.add_argument("--manifest", help="Use the specified manifest", action='store', default='default')
-    build_rootfs.add_argument("source_root", help="Path to the source root directory used for dnf configuration.")
+    build_rootfs.add_argument("source_root", help="Path to the source root directory used for dnf configuration (default=/)", nargs='?', default='/')
     build_rootfs.add_argument("target", help="Path to the target root directory that will be generated.")
     build_rootfs.set_defaults(func=run_build_rootfs)
 
