@@ -6,12 +6,9 @@ opt-usrlocal: "root"
 # https://github.com/CentOS/centos-bootc/issues/167
 machineid-compat: true
 
-# Note that the default for c9s+ is sqlite; we can't rely on rpm being
-# in the target (it isn't in minimal!) so turn this to host here.  This
-# does break the "hermetic build" aspect a bit.  Maybe eventually
-# what we should do is special case this and actually install RPM temporarily
-# and then remove it...
-rpmdb: host
+rpmdb: target
+# We never want rpmdb.sqlite-shm as it's unreproducible
+rpmdb-normalize: true
 
 ignore-removed-users:
   - root
