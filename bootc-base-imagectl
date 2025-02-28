@@ -48,7 +48,7 @@ def run_build_rootfs(args):
         for d in [MANIFESTDIR]:
             dst = path.join(target, d)
             print(f"Copying /{d} to {dst}")
-            shutil.copytree('/' + d, dst)
+            shutil.copytree('/' + d, dst, symlinks=True)
         for f in ['usr/libexec/bootc-base-imagectl']:
             dst = path.join(target, f)
             print(f"Copying /{f} to {dst}")
