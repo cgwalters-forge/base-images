@@ -47,6 +47,54 @@ This command takes just two arguments:
 - A path to the target root filesystem which will be generated as
   a directory. The target should not already exist (but its parent must exist).
 
+## Using bootc-base-imagectl rechunk
+
+This operation is strongly related to `build-rootfs` but is also orthogonal;
+it can be used on a "regular" container build as well.
+
+This command assumes it will be run as a container image, and defaults
+to wanting write access to the container storage.
+
+```
+podman run --rm --privileged -v /var/lib/containers:/var/lib/containers quay.io/fedora/fedora-bootc:rawhide \
+  bootc-base-imagectl rechunk quay.io/exampleos/exampleos:build quay.io/exampleos/exampleos:latest
+```
+
+### Rationale
+
+When performing a complex container derivation, there are several issues:
+
+#### Replaced duplicate content
+
+When e.g. upgrading or replacing the kernel or other large packages
+as part of a container build (without squashing all layers) then
+the old replaced content will still be present.
+
+#### Removed content still present
+
+Similarly, `RUN dnf -y remove` etc. will still retain that removed
+content in prior layers.
+
+#### Timestamp drift
+
+By default, many tools will use the current timestamp when writing
+files. `rpm` will do this (unless `SOURCE_DATE_EPOCH` is set), and
+other tools like `cp` and `curl` will as well.
+
+This means that every build of the image will produce a new
+tar stream (with new timestamps) - that will get pushed to a registry
+and downloaded by clients, even if the content didn't actually change.
+
+### What rechunk does: split reproducible chunked images
+
+The `bootc-base-imagectl rechunk` command fixes all of these issues
+by taking an input container, operates on its final merged filesystem
+tree (hence removed/overridden files are handled), and then splits it up
+(currently based on the RPM database) into separate layers (tarballs). 
+
+Further, because bootc uses OSTree today, and OSTree canonializes all timestamps
+to zero on the client side, this tool does that at build time.
+
 ### Other options
 
 `bootc-base-imagectl list` will enumerate available configurations that

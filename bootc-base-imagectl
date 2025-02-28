@@ -54,6 +54,24 @@ def run_build_rootfs(args):
             print(f"Copying /{f} to {dst}")
             shutil.copy('/' + f, dst)
 
+def run_rechunk(args):
+    argv = [
+            'rpm-ostree',
+            'experimental',
+            'compose',
+            'build-chunked-oci']
+    if args.max_layers is not None:
+        argv.append(f"--max-layers={args.max_layers}")
+    argv.extend(['--bootc',
+            '--format-version=1',
+            f'--from={args.from_image}',
+            f'--output=containers-storage:{args.to_image}'])
+    try:
+        subprocess.run(argv, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing command: {e}")
+        sys.exit(1)
+
 def run_list(args):
     d = '/' + MANIFESTDIR
     for ent in sorted(os.listdir(d)):
@@ -79,6 +97,12 @@ if __name__ == "__main__":
     build_rootfs.add_argument("source_root", help="Path to the source root directory used for dnf configuration (default=/)", nargs='?', default='/')
     build_rootfs.add_argument("target", help="Path to the target root directory that will be generated.")
     build_rootfs.set_defaults(func=run_build_rootfs)
+
+    cmd_rechunk = subparsers.add_parser('rechunk', help="Generate a new container image with split, reproducible, chunked layers")
+    cmd_rechunk.add_argument("--max-layers", help="Configure the number of output layers")
+    cmd_rechunk.add_argument("from_image", help="Operate on this image in the container storage")
+    cmd_rechunk.add_argument("to_image", help="Output a new image to the container storage")
+    cmd_rechunk.set_defaults(func=run_rechunk)
 
     cmd_list = subparsers.add_parser('list', help='List available manifests')
     cmd_list.set_defaults(func=run_list)
