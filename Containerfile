@@ -3,13 +3,14 @@
 # podman build --security-opt=label=disable --cap-add=all --device /dev/fuse <...>
 
 # NOTE: This container build will output a single giant layer. It is strongly recommended
-# to run the "rechunker" on the output of this build, see 
+# to run the "rechunker" on the output of this build, see
 # https://coreos.github.io/rpm-ostree/experimental-build-chunked-oci/
 
 # Override this repos container to control the base image package versions. For
 # example, podman build --from=quay.io/fedora/fedora:41 will get you a system
 # that uses Fedora 41 packages. Or inject arbitrary yum repos (COPR, etc) here.
-FROM quay.io/fedora/fedora:rawhide as repos
+ARG REPOS_IMAGE=quay.io/fedora/fedora:rawhide
+FROM $REPOS_IMAGE as repos
 
 # BOOTSTRAPPING: This can be any image that has rpm-ostree and selinux-policy-targeted.
 FROM quay.io/fedora/fedora:41 as builder
