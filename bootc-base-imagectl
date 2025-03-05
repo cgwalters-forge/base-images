@@ -4,6 +4,7 @@ import os
 import os.path as path
 import subprocess
 import shutil
+import stat
 import json
 import argparse
 import sys
@@ -30,6 +31,11 @@ def run_build_rootfs(args):
         rpmostree_argv.extend([f'/{MANIFESTDIR}/{manifest_path}', target])
         # Perform the build
         subprocess.run(rpmostree_argv, check=True)
+        # Work around https://github.com/coreos/rpm-ostree/pull/5322
+        root_mode = os.lstat(target).st_mode
+        if (root_mode & stat.S_IXOTH) == 0:
+            print("Updating rootfs mode")
+            os.chmod(target, root_mode | (0o555))
         # And run the bootc linter for good measure
         subprocess.run([
             'bootc',
