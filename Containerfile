@@ -44,6 +44,10 @@ EORUN
 # This pulls in the rootfs generated in the previous step
 FROM scratch
 COPY --from=builder /target-rootfs/ /
+# Note in practice this won't be right in a cross build, so we don't
+# set it here. This placeholder is just to note that it *should* be set
+# by the larger build system (e.g. Konflux).
+LABEL org.opencontainers.image.version 43
 LABEL containers.bootc 1
 # This is an ad-hoc way for us to reference bootc-image-builder in
 # a way that in theory client tooling can inspect and find. Today
