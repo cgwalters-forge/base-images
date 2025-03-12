@@ -34,6 +34,8 @@ set -xeuo pipefail
 # Put our manifests into the builder image in the same location they'll be in the
 # final image.
 ./install-manifests
+# And embed the rebuild script
+install -m 0755 -t /usr/libexec ./bootc-base-imagectl
 # Verify that listing works
 /usr/libexec/bootc-base-imagectl list >/dev/null
 # Run the build script in the same way we expect custom images to do, and also
