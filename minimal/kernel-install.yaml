@@ -13,9 +13,13 @@ postprocess:
     # https://dnf.readthedocs.io/en/latest/conf_ref.html#main-options
     # Let's add the config to a distribution configuration file if dnf5
     # is used, we append to /etc/dnf/dnf.conf if not.
+    # Also set protect_running_kernel=False, dnf/yum pre-dates Containers and
+    # uses uname to protect the running kernel even on Container builds.
     if [ -d "/usr/share/dnf5/libdnf.conf.d/" ]; then
       echo -e "[main]\ninstallonlypkgs=''" >> /usr/share/dnf5/libdnf.conf.d/20-ostree-installonlypkgs.conf
+      echo -e "[main]\nprotect_running_kernel=False" >> /usr/share/dnf5/libdnf.conf.d/20-ostree-protect_running_kernel.conf
     else
       echo "installonlypkgs=''" >> /etc/dnf/dnf.conf
+      echo "protect_running_kernel=False" >> /etc/dnf/dnf.conf
     fi
 
