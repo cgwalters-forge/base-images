@@ -8,7 +8,7 @@ metadata:
 recommends: true
 
 include:
-  - ../tier-x/manifest.yaml
+  - ../minimal-plus/manifest.yaml
   - autoupdates.yaml
   - networking-tools.yaml
   - system-configuration.yaml
