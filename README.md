@@ -63,15 +63,12 @@ to support smaller custom images. For more on this, see
 - **minimal**: This content set is more of a convenient centralization point for CI
   and curation around a package set that is intended as a starting point fror
   a container base image.
-- **tier-x**: This content set is the shared base used by all image-based
+- **minimal-plus**: This content set is intended to be the shared base used by all image-based
   Fedora variants (IoT, Atomic Desktops, and CoreOS).
-  Changes to this tier may be done without accounting for external users.
-  To build this, pass `--build-arg=MANIFEST=fedora-tier-x.yaml` to the build
-  command above.
 
-**standard** inherits from **tier-x** and **tier-x** in turn inherit from **minimal**.
+**standard** inherits from **minimal-plus** and **minimal-plus** in turn inherit from **minimal**.
 
-All non-trivial changes to **minimal** and **tier-x** should be ACKed by at least
+All non-trivial changes to **minimal** and **minimal-plus** should be ACKed by at least
 one stakeholder of each Fedora variant WGs.
 
 ## More information

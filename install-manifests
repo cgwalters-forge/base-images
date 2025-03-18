@@ -4,7 +4,7 @@ set -xeuo pipefail
 # into their installed location.
 manifestdir=${1:-/usr/share/doc/bootc-base-imagectl/manifests}
 mkdir -p "$manifestdir/"
-for image in minimal standard tier-x; do
+for image in minimal standard minimal-plus; do
     # Embed the generic defaults
     cp -a $image $manifestdir/
     # And the Fedora-specific tweaks
