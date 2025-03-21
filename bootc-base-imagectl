@@ -20,7 +20,7 @@ def run_build_rootfs(args):
         manifest_path = os.path.join(args.manifest, 'manifest.yaml')
     else:
         manifest_path = args.manifest + '.yaml'
-    rpmostree_argv = ['rpm-ostree', 'experimental', 'compose', 'rootfs']
+    rpmostree_argv = ['rpm-ostree', 'compose', 'rootfs']
     try:
         # Assume we can mutate alternative roots
         if args.source_root != '/':
