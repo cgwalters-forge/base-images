@@ -14,9 +14,14 @@ ignore-removed-users:
   - root
 ignore-removed-groups:
   - root
+# By default users and groups are injected to nss-altfiles
+# which is immutable. This list moves a selected set
+# to /etc/group instead, which is mutable per system
+# and allows local users to become part of these groups.
 etc-group-members:
   - wheel
   - systemd-journal
+  - tss # https://issues.redhat.com/browse/BIFROST-618
   - adm
 
 check-passwd:
