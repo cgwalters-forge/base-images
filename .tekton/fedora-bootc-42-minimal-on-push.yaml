@@ -1,0 +1,48 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://gitlab.com/fedora/bootc/base-images/-/tree/{{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/cancel-in-progress: "false"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
+      == "main"
+  creationTimestamp: null
+  labels:
+    appstudio.openshift.io/application: fedora-bootc-42
+    appstudio.openshift.io/component: fedora-bootc-42-minimal
+    pipelines.appstudio.openshift.io/type: build
+  name: fedora-bootc-42-minimal-on-push
+spec:
+  params:
+  - name: git-url
+    value: '{{source_url}}'
+  - name: revision
+    value: '{{revision}}'
+  - name: build-platforms
+    value:
+    - linux/amd64
+    - linux/arm64
+  - name: dockerfile
+    value: Containerfile
+  - name: path-context
+    value: .
+  - name: privileged-nested
+    value: true
+  - name: build-args
+    value:
+    - REPOS_IMAGE=quay.io/fedora/fedora:42
+    - MANIFEST=fedora-minimal
+  - name: output-image
+    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-42-minimal:{{revision}}
+  pipelineRef:
+    params:
+    - name: bundle
+      value: quay.io/fedora-testing/tekton-catalog:pipeline-buildah-build-bootc-multi-platform-oci-ta
+    - name: name
+      value: buildah-build-bootc-multi-platform-oci-ta
+    - name: kind
+      value: pipeline
+    resolver: bundles
