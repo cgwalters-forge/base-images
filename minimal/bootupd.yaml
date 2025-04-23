@@ -8,6 +8,14 @@ packages-aarch64:
   - grub2-efi-aa64 efibootmgr shim
 packages-ppc64le:
   - grub2 ostree-grub2
+packages-riscv64:
+  - grub2-efi-riscv64 efibootmgr
+  # Don't specify just `shim` for now because riscv isn't built in
+  # main koji instance yet and thus isn't signed. Here we specify
+  # the path to the provided file so when we do switch to the signed
+  # `shim` package it will transparently happen and we can clean up
+  # this packagelist entry later.
+  - /boot/efi/EFI/fedora/shimriscv64.efi
 packages-s390x:
   # For zipl
   - s390utils-core
