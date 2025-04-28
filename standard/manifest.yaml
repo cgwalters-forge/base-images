@@ -44,6 +44,8 @@ packages:
   - sos
   # Make Ansible "package" builtin work by default
   - python3-libdnf5
+  # Make Ansible "package_facts" builtin work by default
+  - python3-rpm
 
 # These are random architecture-specific packages
 packages-x86_64:
