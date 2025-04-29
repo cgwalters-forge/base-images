@@ -13,10 +13,11 @@
 # Note we also support --build-arg REPOS_IMAGE=quay.io/fedora/fedora:41 here
 # since konflux doesn't yet support --from.
 ARG REPOS_IMAGE=quay.io/fedora/fedora:rawhide
+ARG BUILDER_IMAGE=quay.io/fedora/fedora:rawhide
 FROM $REPOS_IMAGE as repos
 
 # BOOTSTRAPPING: This can be any image that has rpm-ostree and selinux-policy-targeted.
-FROM quay.io/fedora/fedora:rawhide as builder
+FROM $BUILDER_IMAGE as builder
 RUN dnf -y install rpm-ostree selinux-policy-targeted
 ARG MANIFEST=fedora-standard
 # The input git repository has .repo files committed to git rpm-ostree has historically
