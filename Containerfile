@@ -9,6 +9,9 @@
 # Override this repos container to control the base image package versions. For
 # example, podman build --from=quay.io/fedora/fedora:41 will get you a system
 # that uses Fedora 41 packages. Or inject arbitrary yum repos (COPR, etc) here.
+#
+# Note we also support --build-arg REPOS_IMAGE=quay.io/fedora/fedora:41 here
+# since konflux doesn't yet support --from.
 ARG REPOS_IMAGE=quay.io/fedora/fedora:rawhide
 FROM $REPOS_IMAGE as repos
 
