@@ -6,12 +6,26 @@ packages:
   # Improved MOTD experience
   - console-login-helper-messages-issuegen
   - console-login-helper-messages-profile
-  # kdump support
-  # https://github.com/coreos/fedora-coreos-tracker/issues/622
-  - kexec-tools
   # Container tooling
   - toolbox
   # nvme-cli for managing nvme disks
   - nvme-cli
   # Used by admins interactively
   - lsof
+
+conditional-include:
+  - if: basearch != "riscv64"
+    # TODO: kexec-tools isn't built for riscv yet so conditionalize these here
+    #       https://github.com/coreos/fedora-coreos-tracker/issues/1931
+    include:
+      packages:
+        # kdump support
+        # https://github.com/coreos/fedora-coreos-tracker/issues/622
+        # The makedumpfile and kdump-utils RPMs were broken out in
+        # Fedora and EL10+. To be able to use the same package list
+        # Across EL9 + Fedora + EL10 let's just name paths for now.
+        # We can go back to just specifying the RPM names when we
+        # no longer support EL9.
+        - kexec-tools
+        - /usr/share/makedumpfile # makedumpfile RPM
+        - /usr/bin/kdumpctl       # kdump-utils RPM
