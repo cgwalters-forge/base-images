@@ -16,9 +16,10 @@ ARG REPOS_IMAGE=quay.io/fedora/fedora:rawhide
 ARG BUILDER_IMAGE=quay.io/fedora/fedora:rawhide
 FROM $REPOS_IMAGE as repos
 
-# BOOTSTRAPPING: This can be any image that has rpm-ostree and selinux-policy-targeted.
+# BOOTSTRAPPING: This can be any image that has rpm-ostree, selinux-policy-targeted
+#                and python3 (for bootc-base-imagectl).
 FROM $BUILDER_IMAGE as builder
-RUN dnf -y install rpm-ostree selinux-policy-targeted
+RUN dnf -y install rpm-ostree selinux-policy-targeted python3
 ARG MANIFEST=fedora-standard
 # The input git repository has .repo files committed to git rpm-ostree has historically
 # emphasized that.  But here, we are fetching the repos from the container base image.
