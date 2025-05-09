@@ -90,7 +90,7 @@ and downloaded by clients, even if the content didn't actually change.
 The `bootc-base-imagectl rechunk` command fixes all of these issues
 by taking an input container, operates on its final merged filesystem
 tree (hence removed/overridden files are handled), and then splits it up
-(currently based on the RPM database) into separate layers (tarballs). 
+(currently based on the RPM database) into separate layers (tarballs).
 
 Further, because bootc uses OSTree today, and OSTree canonializes all timestamps
 to zero on the client side, this tool does that at build time.
@@ -104,7 +104,7 @@ can be selected by passing `--manifest` to `build-rootfs`.
 
 The current implementation uses `rpm-ostree` on a manifest (treefile)
 embedded in the container image itself. These manifests are not intended
-to be editable directly. 
+to be editable directly.
 
 To emphasize: the implementation of this command (especially the configuration
 files that it reads) are subject to change.
@@ -113,7 +113,7 @@ files that it reads) are subject to change.
 
 The build tooling is designed to support "cross builds"; the
 repository root could e.g. be CentOS Stream 10, while the
-builder root is Fedora or RHEL, etc. 
+builder root is Fedora or RHEL, etc.
 
 In other words, one given base image can be used as a "builder" to produce another
 using different RPMs.

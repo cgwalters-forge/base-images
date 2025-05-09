@@ -1,6 +1,6 @@
 metadata:
   summary: Fedora IoT bootc image
-  
+
 variables:
   distro: "fedora-iot"
 
@@ -56,4 +56,4 @@ packages-aarch64:
   - bcm283x-firmware
   - optee_client
   - uboot-images-armv8
-  
+

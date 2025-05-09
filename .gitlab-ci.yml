@@ -15,7 +15,7 @@ build-minimal:
   script: |
     set -xeuo pipefail
     buildah build -f Containerfile --no-cache -t localhost/fedora-bootc:minimal ${PRIV_ARGS} --build-arg=manifest=fedora-minimal .
-    cd tests/rootfs && buildah build -t localhost/test --from localhost/fedora-bootc:minimal    
+    cd tests/rootfs && buildah build -t localhost/test --from localhost/fedora-bootc:minimal
 
 build-minimal-plus:
   extends: .build-image
