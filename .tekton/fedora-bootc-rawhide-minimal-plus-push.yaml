@@ -4,20 +4,19 @@ metadata:
   annotations:
     build.appstudio.openshift.io/repo: https://gitlab.com/fedora/bootc/base-images/-/tree/{{revision}}
     build.appstudio.redhat.com/commit_sha: '{{revision}}'
-    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
-    pipelinesascode.tekton.dev/cancel-in-progress: "true"
+    pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch
+    pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
       == "main" && ( "./fedora-minimal-plus.yaml".pathChanged() || "./fedora-includes/generic.yaml".pathChanged()
-      || "./minimal-plus/***".pathChanged() || ".tekton/fedora-bootc-rawhide-minimal-plus-on-pull-request.yaml".pathChanged()
+      || "./minimal-plus/***".pathChanged() || ".tekton/fedora-bootc-rawhide-minimal-plus-push.yaml".pathChanged()
       || "Containerfile".pathChanged() )
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: fedora-bootc-rawhide
     appstudio.openshift.io/component: fedora-bootc-rawhide-minimal-plus
     pipelines.appstudio.openshift.io/type: build
-  name: fedora-bootc-rawhide-minimal-plus-on-pull-request
+  name: fedora-bootc-rawhide-minimal-plus-on-push
 spec:
   params:
   - name: git-url
@@ -38,10 +37,8 @@ spec:
     value:
     - REPOS_IMAGE=quay.io/fedora/fedora:rawhide
     - MANIFEST=fedora-minimal-plus
-  - name: image-expires-after
-    value: 5d
   - name: output-image
-    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-rawhide-minimal-plus:on-pr-{{revision}}
+    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-rawhide-minimal-plus:{{revision}}
   pipelineRef:
     params:
     - name: bundle
