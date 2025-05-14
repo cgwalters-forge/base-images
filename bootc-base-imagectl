@@ -8,6 +8,7 @@ import stat
 import json
 import argparse
 import sys
+import tempfile
 
 MANIFESTDIR = 'usr/share/doc/bootc-base-imagectl/manifests'
 
@@ -17,9 +18,23 @@ def run_build_rootfs(args):
     """
     target = args.target
     if os.path.isdir(args.manifest):
-        manifest_path = os.path.join(args.manifest, 'manifest.yaml')
+        manifest_path = os.path.join(f'/{MANIFESTDIR}', args.manifest, 'manifest.yaml')
     else:
-        manifest_path = args.manifest + '.yaml'
+        manifest_path = f'/{MANIFESTDIR}/{args.manifest}.yaml'
+
+    tmp_manifest = None
+    if args.install:
+        additional_pkgs = set(args.install)
+        if len(additional_pkgs) > 0:
+            final_manifest = {
+                "include": manifest_path,
+                "packages": list(additional_pkgs),
+            }
+            tmp_manifest = tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', suffix='.json', delete_on_close=False)
+            json.dump(final_manifest, tmp_manifest)
+            tmp_manifest.close()
+            manifest_path = tmp_manifest.name
+
     rpmostree_argv = ['rpm-ostree', 'compose', 'rootfs']
     try:
         # Assume we can mutate alternative roots
@@ -28,7 +43,7 @@ def run_build_rootfs(args):
         else:
             # But we shouldn't need to mutate the default root
             rpmostree_argv.append('--source-root=/')
-        rpmostree_argv.extend([f'/{MANIFESTDIR}/{manifest_path}', target])
+        rpmostree_argv.extend([manifest_path, target])
         # Perform the build
         subprocess.run(rpmostree_argv, check=True)
         # Work around https://github.com/coreos/rpm-ostree/pull/5322
@@ -46,6 +61,9 @@ def run_build_rootfs(args):
     except subprocess.CalledProcessError as e:
         print(f"Error executing command: {e}")
         sys.exit(1)
+    finally:
+        if tmp_manifest is not None:
+            del tmp_manifest
 
     # Copy our own build configuration into the target if configured;
     # this is used for the first stage build. But by default *secondary*
@@ -95,11 +113,13 @@ def run_list(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Operate on the build configuration for this container")
+    parser.add_argument("--args-file", help="File containing arguments to parse (one argument per line)", metavar='FILE')
     subparsers = parser.add_subparsers(help='Subcommands', required=True)
 
     build_rootfs = subparsers.add_parser('build-rootfs', help='Generate a container root filesystem')
     build_rootfs.add_argument("--reinject", help="Also reinject the build configurations into the target", action='store_true')
     build_rootfs.add_argument("--manifest", help="Use the specified manifest", action='store', default='default')
+    build_rootfs.add_argument("--install", help="Add a package", action='append', default=[], metavar='PACKAGE')
     build_rootfs.add_argument("source_root", help="Path to the source root directory used for dnf configuration (default=/)", nargs='?', default='/')
     build_rootfs.add_argument("target", help="Path to the target root directory that will be generated.")
     build_rootfs.set_defaults(func=run_build_rootfs)
@@ -114,5 +134,12 @@ if __name__ == "__main__":
     cmd_list.set_defaults(func=run_list)
 
     args = parser.parse_args()
+    if args.args_file:
+        add_args = []
+        with open(args.args_file) as f:
+            for line in f:
+                add_args += [line.strip()]
+        args = parser.parse_args(sys.argv[1:] + add_args)
+
     args.func(args)
 
