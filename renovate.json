@@ -4,6 +4,39 @@
     "github>platform-engineering-org/.github"
   ],
   "dependencyDashboard": true,
+  "tekton": {
+    "additionalBranchPrefix": "",
+    "includePaths": [
+      ".tekton/**"
+    ],
+    "fileMatch": [
+      "\\.yaml$",
+      "\\.yml$"
+    ],
+    "packageRules": [
+      {
+        "matchPackageNames": [
+          "/^quay.io/bootc-devel/tekton-catalog//"
+        ],
+        "enabled": true,
+        "groupName": "Konflux references",
+        "branchPrefix": "konflux/references/",
+        "group": {
+          "branchTopic": "{{{baseBranch}}}",
+          "commitMessageTopic": "{{{groupName}}}"
+        },
+        "commitMessageTopic": "Konflux references",
+        "prBodyColumns": [
+          "Package",
+          "Change",
+          "Notes"
+        ],
+        "prBodyTemplate": "{{{header}}}{{{table}}}{{{notes}}}{{{changelogs}}}{{{configDescription}}}{{{controls}}}{{{footer}}}",
+        "recreateWhen": "always",
+        "rebaseWhen": "behind-base-branch"
+      }
+    ]
+  },
   "baseBranches": ["main", "f40", "f41"],
   "packageRules": [
     {
