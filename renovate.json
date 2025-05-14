@@ -37,6 +37,27 @@
       }
     ]
   },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": [
+        "Update 'REPOS_IMAGE' and 'BUILDER_IMAGE' in tekton files"
+      ],
+      "baseBranches": [
+        "main"
+      ],
+      "fileMatch": [
+      ".tekton/.*\\.yaml$",
+      ".tekton/.*\\.yml$"
+      ],
+      "matchStrings": [
+        "REPOS_IMAGE=(?<depName>.*):(?<currentValue>.*)@(?<currentDigest>.*)\\n",
+        "BUILDER_IMAGE=(?<depName>.*):(?<currentValue>.*)@(?<currentDigest>.*)\\n"
+      ],
+      "versioningTemplate": "regex:(?<compatibility>.*)-(?<minor>\\d{8})(\\.n)?\\.(?<build>\\d)",
+      "datasourceTemplate": "docker"
+    }
+  ],
   "baseBranches": ["main", "f40", "f41"],
   "packageRules": [
     {
