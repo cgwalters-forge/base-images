@@ -27,6 +27,7 @@ include:
   - initramfs.yaml
   - basic-fixes.yaml
   - kernel-install.yaml
+  - systemd-presets.yaml
 
 packages:
   # this is implied by dependencies but let's make it explicit
