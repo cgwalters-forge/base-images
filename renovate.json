@@ -3,6 +3,7 @@
   "extends": [
     "github>platform-engineering-org/.github"
   ],
+  "dependencyDashboard": true,
   "baseBranches": ["main", "f40", "f41"],
   "packageRules": [
     {
