@@ -59,15 +59,6 @@ packages-aarch64:
   - irqbalance
 
 postprocess:
-  # Undo RPM scripts enabling units; we want the presets to be canonical
-  # https://github.com/projectatomic/rpm-ostree/issues/1803
-  - |
-    #!/usr/bin/env bash
-    set -xeuo pipefail
-    rm -rf /etc/systemd/system/*
-    systemctl preset-all
-    rm -rf /etc/systemd/user/*
-    systemctl --user --global preset-all
   # See: https://github.com/coreos/fedora-coreos-tracker/issues/1253
   #      https://bugzilla.redhat.com/show_bug.cgi?id=2112857
   #      https://github.com/coreos/rpm-ostree/issues/3918
