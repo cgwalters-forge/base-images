@@ -61,6 +61,12 @@
   "baseBranches": ["main", "f40", "f41"],
   "packageRules": [
     {
+      "matchPackageNames": [
+        "quay.io/bootc-devel/.*-compose"
+      ],
+      "automerge": true
+    },
+    {
       "matchPackageNames": ["quay.io/fedora/fedora"],
       "allowedVersions": "=40",
       "matchBaseBranches": ["f40"]
