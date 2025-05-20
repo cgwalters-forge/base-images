@@ -28,8 +28,7 @@ ARG MANIFEST=fedora-standard
 COPY . /src
 WORKDIR /src
 RUN rm -vf /src/*.repo
-RUN --mount=type=cache,target=/workdir \
-    --mount=type=bind,rw,from=repos,src=/,dst=/repos <<EORUN
+RUN --mount=type=bind,rw,from=repos,src=/,dst=/repos <<EORUN
 set -xeuo pipefail
 # Put our manifests into the builder image in the same location they'll be in the
 # final image.

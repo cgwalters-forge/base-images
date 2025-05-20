@@ -37,6 +37,8 @@ def run_build_rootfs(args):
 
     rpmostree_argv = ['rpm-ostree', 'compose', 'rootfs']
     try:
+        if args.cachedir != "":
+            rpmostree_argv.append(f"--cachedir={args.cachedir}")
         # Assume we can mutate alternative roots
         if args.source_root != '/':
             rpmostree_argv.append(f'--source-root-rw={args.source_root}')
@@ -120,6 +122,7 @@ if __name__ == "__main__":
     build_rootfs.add_argument("--reinject", help="Also reinject the build configurations into the target", action='store_true')
     build_rootfs.add_argument("--manifest", help="Use the specified manifest", action='store', default='default')
     build_rootfs.add_argument("--install", help="Add a package", action='append', default=[], metavar='PACKAGE')
+    build_rootfs.add_argument("--cachedir", help="Cache repo metadata and RPMs in specified directory", action='store', default='')
     build_rootfs.add_argument("source_root", help="Path to the source root directory used for dnf configuration (default=/)", nargs='?', default='/')
     build_rootfs.add_argument("target", help="Path to the target root directory that will be generated.")
     build_rootfs.set_defaults(func=run_build_rootfs)
