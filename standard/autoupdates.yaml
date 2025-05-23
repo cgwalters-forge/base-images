@@ -2,8 +2,7 @@
 postprocess:
   - |
     #!/usr/bin/env bash
-    set -euo pipefail
+    set -xeuo pipefail
     target=/usr/lib/systemd/system/default.target.wants
     mkdir -p $target
-    set -x
     ln -s ../bootc-fetch-apply-updates.timer $target
