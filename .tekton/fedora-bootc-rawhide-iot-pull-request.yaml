@@ -1,0 +1,55 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://gitlab.com/fedora/bootc/base-images/-/tree/{{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/cancel-in-progress: "true"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch
+      == "main" && ( "./fedora-iot.yaml".pathChanged() || "./iot/***".pathChanged()
+      || "./fedora-minimal-plus.yaml".pathChanged() || "./minimal-plus/***".pathChanged()
+      || "./fedora-minimal.yaml".pathChanged() || "./minimal/***".pathChanged() ||
+      "./fedora-includes/generic.yaml".pathChanged() || ".tekton/fedora-bootc-rawhide-iot-pull-request.yaml".pathChanged()
+      || "Containerfile".pathChanged() )
+  creationTimestamp: null
+  labels:
+    appstudio.openshift.io/application: fedora-bootc-rawhide
+    appstudio.openshift.io/component: fedora-bootc-rawhide-iot
+    pipelines.appstudio.openshift.io/type: build
+  name: fedora-bootc-rawhide-iot-on-pull-request
+spec:
+  params:
+  - name: git-url
+    value: '{{source_url}}'
+  - name: revision
+    value: '{{revision}}'
+  - name: build-platforms
+    value:
+    - linux/amd64
+    - linux/arm64
+  - name: dockerfile
+    value: Containerfile
+  - name: path-context
+    value: .
+  - name: privileged-nested
+    value: true
+  - name: build-args
+    value:
+    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-rawhide-compose:Fedora-Rawhide-20250520.n.0@sha256:38ed31949d03f6531a9599d3ca8ee35f5e35a2b353276f2be666e9a9d8eae7fe
+    - MANIFEST=fedora-iot
+  - name: image-expires-after
+    value: 5d
+  - name: output-image
+    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-rawhide-iot:on-pr-{{revision}}
+  pipelineRef:
+    params:
+    - name: bundle
+      value: quay.io/bootc-devel/tekton-catalog/pipeline-buildah-build-bootc-multi-platform-oci-ta@sha256:2474cc2cd84db2bc0abe595d35a878d01af3bf8783aac0ccc252c9a7a00d8271
+    - name: name
+      value: buildah-build-bootc-multi-platform-oci-ta
+    - name: kind
+      value: pipeline
+    resolver: bundles
