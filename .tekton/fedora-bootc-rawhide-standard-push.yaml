@@ -8,7 +8,9 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
-      == "main"
+      == "main" && ( "./fedora-standard.yaml".pathChanged() || "./fedora-includes/generic.yaml".pathChanged()
+      || "./standard/***".pathChanged() || ".tekton/fedora-bootc-rawhide-standard-push.yaml".pathChanged()
+      || "Containerfile".pathChanged() )
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: fedora-bootc-rawhide
@@ -33,14 +35,14 @@ spec:
     value: true
   - name: build-args
     value:
-    - REPOS_IMAGE=quay.io/fedora/fedora:rawhide
+    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-rawhide-compose:Fedora-Rawhide-20250520.n.0@sha256:38ed31949d03f6531a9599d3ca8ee35f5e35a2b353276f2be666e9a9d8eae7fe
     - MANIFEST=fedora-standard
   - name: output-image
     value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-rawhide-standard:{{revision}}
   pipelineRef:
     params:
     - name: bundle
-      value: quay.io/fedora-testing/tekton-catalog:pipeline-buildah-build-bootc-multi-platform-oci-ta
+      value: quay.io/bootc-devel/tekton-catalog/pipeline-buildah-build-bootc-multi-platform-oci-ta@sha256:2474cc2cd84db2bc0abe595d35a878d01af3bf8783aac0ccc252c9a7a00d8271
     - name: name
       value: buildah-build-bootc-multi-platform-oci-ta
     - name: kind
