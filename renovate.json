@@ -3,8 +3,69 @@
   "extends": [
     "github>platform-engineering-org/.github"
   ],
+  "dependencyDashboard": true,
+  "tekton": {
+    "additionalBranchPrefix": "",
+    "includePaths": [
+      ".tekton/**"
+    ],
+    "fileMatch": [
+      "\\.yaml$",
+      "\\.yml$"
+    ],
+    "packageRules": [
+      {
+        "matchPackageNames": [
+          "/^quay.io/bootc-devel/tekton-catalog//"
+        ],
+        "enabled": true,
+        "groupName": "Konflux references",
+        "branchPrefix": "konflux/references/",
+        "group": {
+          "branchTopic": "{{{baseBranch}}}",
+          "commitMessageTopic": "{{{groupName}}}"
+        },
+        "commitMessageTopic": "Konflux references",
+        "prBodyColumns": [
+          "Package",
+          "Change",
+          "Notes"
+        ],
+        "prBodyTemplate": "{{{header}}}{{{table}}}{{{notes}}}{{{changelogs}}}{{{configDescription}}}{{{controls}}}{{{footer}}}",
+        "recreateWhen": "always",
+        "rebaseWhen": "behind-base-branch"
+      }
+    ]
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": [
+        "Update 'REPOS_IMAGE' and 'BUILDER_IMAGE' in tekton files"
+      ],
+      "baseBranches": [
+        "main"
+      ],
+      "fileMatch": [
+      ".tekton/.*\\.yaml$",
+      ".tekton/.*\\.yml$"
+      ],
+      "matchStrings": [
+        "REPOS_IMAGE=(?<depName>.*):(?<currentValue>.*)@(?<currentDigest>.*)\\n",
+        "BUILDER_IMAGE=(?<depName>.*):(?<currentValue>.*)@(?<currentDigest>.*)\\n"
+      ],
+      "versioningTemplate": "regex:(?<compatibility>.*)-(?<minor>\\d{8})(\\.n)?\\.(?<build>\\d)",
+      "datasourceTemplate": "docker"
+    }
+  ],
   "baseBranches": ["main", "f40", "f41"],
   "packageRules": [
+    {
+      "matchPackageNames": [
+        "quay.io/bootc-devel/.*-compose"
+      ],
+      "automerge": true
+    },
     {
       "matchPackageNames": ["quay.io/fedora/fedora"],
       "allowedVersions": "=40",
