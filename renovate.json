@@ -43,9 +43,6 @@
       "description": [
         "Update 'REPOS_IMAGE' and 'BUILDER_IMAGE' in tekton files"
       ],
-      "baseBranches": [
-        "main"
-      ],
       "fileMatch": [
       ".tekton/.*\\.yaml$",
       ".tekton/.*\\.yml$"
