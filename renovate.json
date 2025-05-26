@@ -9,9 +9,9 @@
     "includePaths": [
       ".tekton/**"
     ],
-    "fileMatch": [
-      "\\.yaml$",
-      "\\.yml$"
+    "managerFilePatterns": [
+      "/\\.yaml$/",
+      "/\\.yml$/"
     ],
     "packageRules": [
       {
@@ -43,9 +43,9 @@
       "description": [
         "Update 'REPOS_IMAGE' and 'BUILDER_IMAGE' in tekton files"
       ],
-      "fileMatch": [
-      ".tekton/.*\\.yaml$",
-      ".tekton/.*\\.yml$"
+      "managerFilePatterns": [
+        "/.tekton/.*\\.yaml$/",
+        "/.tekton/.*\\.yml$/"
       ],
       "matchStrings": [
         "REPOS_IMAGE=(?<depName>.*):(?<currentValue>.*)@(?<currentDigest>.*)\\n",
@@ -55,7 +55,11 @@
       "datasourceTemplate": "docker"
     }
   ],
-  "baseBranches": ["main", "f40", "f41"],
+  "baseBranches": [
+    "main",
+    "f40",
+    "f41"
+  ],
   "packageRules": [
     {
       "matchPackageNames": [
@@ -64,14 +68,22 @@
       "automerge": true
     },
     {
-      "matchPackageNames": ["quay.io/fedora/fedora"],
+      "matchPackageNames": [
+        "quay.io/fedora/fedora"
+      ],
       "allowedVersions": "=40",
-      "matchBaseBranches": ["f40"]
+      "matchBaseBranches": [
+        "f40"
+      ]
     },
     {
-      "matchPackageNames": ["quay.io/fedora/fedora"],
+      "matchPackageNames": [
+        "quay.io/fedora/fedora"
+      ],
       "allowedVersions": "=41",
-      "matchBaseBranches": ["f41"]
+      "matchBaseBranches": [
+        "f41"
+      ]
     }
   ]
 }
