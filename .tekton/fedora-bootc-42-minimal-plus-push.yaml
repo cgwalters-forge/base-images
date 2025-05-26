@@ -4,20 +4,19 @@ metadata:
   annotations:
     build.appstudio.openshift.io/repo: https://gitlab.com/fedora/bootc/base-images/-/tree/{{revision}}
     build.appstudio.redhat.com/commit_sha: '{{revision}}'
-    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
-    pipelinesascode.tekton.dev/cancel-in-progress: "true"
+    pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch
+    pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
       == "main" && ( "./fedora-minimal-plus.yaml".pathChanged() || "./fedora-includes/generic.yaml".pathChanged()
-      || "./minimal-plus/***".pathChanged() || ".tekton/fedora-bootc-42-minimal-plus-on-pull-request.yaml".pathChanged()
+      || "./minimal-plus/***".pathChanged() || ".tekton/fedora-bootc-42-minimal-plus-push.yaml".pathChanged()
       || "Containerfile".pathChanged() )
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: fedora-bootc-42
     appstudio.openshift.io/component: fedora-bootc-42-minimal-plus
     pipelines.appstudio.openshift.io/type: build
-  name: fedora-bootc-42-minimal-plus-on-pull-request
+  name: fedora-bootc-42-minimal-plus-on-push
 spec:
   params:
   - name: git-url
@@ -36,16 +35,14 @@ spec:
     value: true
   - name: build-args
     value:
-    - REPOS_IMAGE=quay.io/fedora/fedora:42
+    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-42-compose:Fedora-42-20250409.0@sha256:c72e43a4baf6f744b5b87f546d61d9854aa8a6f3b754f94dc456dba76786addf
     - MANIFEST=fedora-minimal-plus
-  - name: image-expires-after
-    value: 5d
   - name: output-image
-    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-42-minimal-plus:on-pr-{{revision}}
+    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-42-minimal-plus:{{revision}}
   pipelineRef:
     params:
     - name: bundle
-      value: quay.io/fedora-testing/tekton-catalog:pipeline-buildah-build-bootc-multi-platform-oci-ta
+      value: quay.io/bootc-devel/tekton-catalog/pipeline-buildah-build-bootc-multi-platform-oci-ta@sha256:2474cc2cd84db2bc0abe595d35a878d01af3bf8783aac0ccc252c9a7a00d8271
     - name: name
       value: buildah-build-bootc-multi-platform-oci-ta
     - name: kind
