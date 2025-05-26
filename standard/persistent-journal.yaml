@@ -5,7 +5,9 @@
 # rid of this once we move to sysusers and create the dir in the initrd.
 
 postprocess:
-  - | #!/bin/bash
+  - |
+    #!/bin/bash
+    set -xeuo pipefail
     mkdir -p /usr/lib/systemd/journald.conf.d/
     cat >/usr/lib/systemd/journald.conf.d/10-centos-bootc-persistent.conf << EOF
     [Journal]
