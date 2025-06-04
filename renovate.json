@@ -61,7 +61,7 @@
   "packageRules": [
     {
       "matchPackageNames": [
-        "quay.io/bootc-devel/.*-compose"
+        "/quay.io\/bootc-devel\/fedora-bootc-.*-compose/"
       ],
       "automerge": true
     },
