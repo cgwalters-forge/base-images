@@ -10,8 +10,7 @@
       ".tekton/**"
     ],
     "managerFilePatterns": [
-      "/\\.yaml$/",
-      "/\\.yml$/"
+      "/\\.ya?ml$/"
     ],
     "packageRules": [
       {
@@ -44,8 +43,7 @@
         "Update 'REPOS_IMAGE' and 'BUILDER_IMAGE' in tekton files"
       ],
       "managerFilePatterns": [
-        "/.tekton/.*\\.yaml$/",
-        "/.tekton/.*\\.yml$/"
+        "/.tekton/.*\\.ya?ml$/"
       ],
       "matchStrings": [
         "REPOS_IMAGE=(?<depName>.*):(?<currentValue>.*)@(?<currentDigest>.*)\\n",
