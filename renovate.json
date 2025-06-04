@@ -49,7 +49,7 @@
         "REPOS_IMAGE=(?<depName>.*):(?<currentValue>.*)@(?<currentDigest>.*)\\n",
         "BUILDER_IMAGE=(?<depName>.*):(?<currentValue>.*)@(?<currentDigest>.*)\\n"
       ],
-      "versioningTemplate": "regex:(?<compatibility>.*)-(?<minor>\\d{8})(\\.n)?\\.(?<build>\\d)",
+      "versioningTemplate": "regex:(?<compatibility>.*)-(?<patch>\\d{8})(\\.n)?\\.(?<build>\\d)",
       "datasourceTemplate": "docker"
     }
   ],
