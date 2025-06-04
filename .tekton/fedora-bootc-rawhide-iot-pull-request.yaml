@@ -53,3 +53,5 @@ spec:
     - name: kind
       value: pipeline
     resolver: bundles
+  timeouts:
+    pipeline: 6h

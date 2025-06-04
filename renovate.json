@@ -10,8 +10,7 @@
       ".tekton/**"
     ],
     "managerFilePatterns": [
-      "/\\.yaml$/",
-      "/\\.yml$/"
+      "/\\.ya?ml$/"
     ],
     "packageRules": [
       {
@@ -44,14 +43,13 @@
         "Update 'REPOS_IMAGE' and 'BUILDER_IMAGE' in tekton files"
       ],
       "managerFilePatterns": [
-        "/.tekton/.*\\.yaml$/",
-        "/.tekton/.*\\.yml$/"
+        "/.tekton/.*\\.ya?ml$/"
       ],
       "matchStrings": [
         "REPOS_IMAGE=(?<depName>.*):(?<currentValue>.*)@(?<currentDigest>.*)\\n",
         "BUILDER_IMAGE=(?<depName>.*):(?<currentValue>.*)@(?<currentDigest>.*)\\n"
       ],
-      "versioningTemplate": "regex:(?<compatibility>.*)-(?<minor>\\d{8})(\\.n)?\\.(?<build>\\d)",
+      "versioningTemplate": "regex:(?<compatibility>.*)-(?<patch>\\d{8})(\\.n)?\\.(?<build>\\d)",
       "datasourceTemplate": "docker"
     }
   ],
@@ -63,9 +61,23 @@
   "packageRules": [
     {
       "matchPackageNames": [
-        "quay.io/bootc-devel/.*-compose"
+        "/quay.io\/bootc-devel\/fedora-bootc-.*-compose/"
       ],
       "automerge": true
+    },
+    {
+      "matchPackageNames": [
+        "/quay.io\/bootc-devel\/fedora-bootc-rawhide-compose/"
+      ],
+      "groupName": "Fedora rawhide compose dependencies",
+      "groupSlug": "fedora-rawhide-compose-dependencies"
+    },
+    {
+      "matchPackageNames": [
+        "/quay.io\/bootc-devel\/fedora-bootc-42-compose/"
+      ],
+      "groupName": "Fedora 42 compose dependencies",
+      "groupSlug": "fedora-42-compose-dependencies"
     },
     {
       "matchPackageNames": [
