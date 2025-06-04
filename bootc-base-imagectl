@@ -22,20 +22,35 @@ def run_build_rootfs(args):
     else:
         manifest_path = f'/{MANIFESTDIR}/{args.manifest}.yaml'
 
-    tmp_manifest = None
+    rpmostree_argv = ['rpm-ostree', 'compose', 'rootfs']
+
+    override_manifest = {}
+    tmp_ostree_repo = None
     if args.install:
         additional_pkgs = set(args.install)
         if len(additional_pkgs) > 0:
-            final_manifest = {
-                "include": manifest_path,
-                "packages": list(additional_pkgs),
-            }
-            tmp_manifest = tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', suffix='.json', delete_on_close=False)
-            json.dump(final_manifest, tmp_manifest)
-            tmp_manifest.close()
-            manifest_path = tmp_manifest.name
+            override_manifest['packages'] = list(additional_pkgs)
+    if args.add_dir:
+        tmp_ostree_repo = tempfile.mkdtemp(dir='/var/tmp')
+        subprocess.check_call(['ostree', 'init', '--repo', tmp_ostree_repo, '--mode=bare'])
+        rpmostree_argv.append(f"--ostree-repo={tmp_ostree_repo}")
+        override_manifest['ostree-layers'] = []
 
-    rpmostree_argv = ['rpm-ostree', 'compose', 'rootfs']
+        for dir in args.add_dir:
+            base = os.path.basename(dir)
+            # capture output to hide commit digest printed
+            subprocess.check_output(['ostree', 'commit', '--repo', tmp_ostree_repo, '-b', f'overlay/{base}', dir,
+                                     '--owner-uid=0', '--owner-gid=0', '--no-xattrs', '--mode-ro-executables'])
+            override_manifest['ostree-layers'].append(f'overlay/{base}')
+
+    tmp_manifest = None
+    if override_manifest:
+        override_manifest['include'] = manifest_path
+        tmp_manifest = tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', suffix='.json', delete_on_close=False)
+        json.dump(override_manifest, tmp_manifest)
+        tmp_manifest.close()
+        manifest_path = tmp_manifest.name
+
     try:
         if args.cachedir != "":
             rpmostree_argv.append(f"--cachedir={args.cachedir}")
@@ -66,6 +81,8 @@ def run_build_rootfs(args):
     finally:
         if tmp_manifest is not None:
             del tmp_manifest
+        if tmp_ostree_repo:
+            shutil.rmtree(tmp_ostree_repo)
 
     # Copy our own build configuration into the target if configured;
     # this is used for the first stage build. But by default *secondary*
@@ -123,6 +140,7 @@ if __name__ == "__main__":
     build_rootfs.add_argument("--manifest", help="Use the specified manifest", action='store', default='default')
     build_rootfs.add_argument("--install", help="Add a package", action='append', default=[], metavar='PACKAGE')
     build_rootfs.add_argument("--cachedir", help="Cache repo metadata and RPMs in specified directory", action='store', default='')
+    build_rootfs.add_argument("--add-dir", help='Copy dir contents into the target', action='append', default=[], metavar='DIR')
     build_rootfs.add_argument("source_root", help="Path to the source root directory used for dnf configuration (default=/)", nargs='?', default='/')
     build_rootfs.add_argument("target", help="Path to the target root directory that will be generated.")
     build_rootfs.set_defaults(func=run_build_rootfs)
