@@ -38,8 +38,9 @@ def run_build_rootfs(args):
 
         for dir in args.add_dir:
             base = os.path.basename(dir)
+            abs = os.path.realpath(dir)
             # capture output to hide commit digest printed
-            subprocess.check_output(['ostree', 'commit', '--repo', tmp_ostree_repo, '-b', f'overlay/{base}', dir,
+            subprocess.check_output(['ostree', 'commit', '--repo', tmp_ostree_repo, '-b', f'overlay/{base}', abs,
                                      '--owner-uid=0', '--owner-gid=0', '--no-xattrs', '--mode-ro-executables'])
             override_manifest['ostree-layers'].append(f'overlay/{base}')
 
