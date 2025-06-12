@@ -47,7 +47,7 @@ def run_build_rootfs(args):
     tmp_manifest = None
     if override_manifest:
         override_manifest['include'] = manifest_path
-        tmp_manifest = tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', suffix='.json', delete_on_close=False)
+        tmp_manifest = tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', suffix='.json', delete=False)
         json.dump(override_manifest, tmp_manifest)
         tmp_manifest.close()
         manifest_path = tmp_manifest.name
@@ -81,7 +81,7 @@ def run_build_rootfs(args):
         sys.exit(1)
     finally:
         if tmp_manifest is not None:
-            del tmp_manifest
+            os.unlink(tmp_manifest.name)
         if tmp_ostree_repo:
             shutil.rmtree(tmp_ostree_repo)
 
