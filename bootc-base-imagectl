@@ -43,6 +43,8 @@ def run_build_rootfs(args):
             subprocess.check_output(['ostree', 'commit', '--repo', tmp_ostree_repo, '-b', f'overlay/{base}', abs,
                                      '--owner-uid=0', '--owner-gid=0', '--no-xattrs', '--mode-ro-executables'])
             override_manifest['ostree-layers'].append(f'overlay/{base}')
+    if args.no_docs:
+        override_manifest['documentation'] = False
 
     tmp_manifest = None
     if override_manifest:
@@ -142,6 +144,7 @@ if __name__ == "__main__":
     build_rootfs.add_argument("--install", help="Add a package", action='append', default=[], metavar='PACKAGE')
     build_rootfs.add_argument("--cachedir", help="Cache repo metadata and RPMs in specified directory", action='store', default='')
     build_rootfs.add_argument("--add-dir", help='Copy dir contents into the target', action='append', default=[], metavar='DIR')
+    build_rootfs.add_argument("--no-docs", help="Don't install documentation", action='store_true')
     build_rootfs.add_argument("source_root", help="Path to the source root directory used for dnf configuration (default=/)", nargs='?', default='/')
     build_rootfs.add_argument("target", help="Path to the target root directory that will be generated.")
     build_rootfs.set_defaults(func=run_build_rootfs)
