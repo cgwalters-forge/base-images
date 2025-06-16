@@ -7,7 +7,9 @@ mkdir -p "$manifestdir/"
 for image in minimal standard minimal-plus iot; do
     # Embed the generic defaults
     cp -a $image $manifestdir/
-    # And the Fedora-specific tweaks
+    # And the top-level Fedora-specific manifests
+    cp -a $image.yaml $manifestdir/
+    # And the legacy `fedora-` prefixed names
     cp -a fedora-$image.yaml $manifestdir/
 done
 # Set the default

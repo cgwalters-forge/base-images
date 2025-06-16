@@ -1,3 +1,1 @@
-include:
-  - fedora-includes/generic.yaml
-  - minimal-plus/manifest.yaml
+minimal-plus.yaml

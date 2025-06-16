@@ -1,4 +1,1 @@
-include:
-  - iot/manifest.yaml
-  - fedora-minimal-plus.yaml
-
+iot.yaml

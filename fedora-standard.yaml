@@ -1,7 +1,1 @@
-include:
-  - fedora-includes/generic.yaml
-  - standard/manifest.yaml
-
-packages:
-  # Make Ansible "package" builtin work by default
-  - python3-libdnf5
+standard.yaml
