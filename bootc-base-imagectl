@@ -17,10 +17,7 @@ def run_build_rootfs(args):
     Regenerates a base image using a build configuration.
     """
     target = args.target
-    if os.path.isdir(args.manifest):
-        manifest_path = os.path.join(f'/{MANIFESTDIR}', args.manifest, 'manifest.yaml')
-    else:
-        manifest_path = f'/{MANIFESTDIR}/{args.manifest}.yaml'
+    manifest_path = f'/{MANIFESTDIR}/{args.manifest}.yaml'
 
     rpmostree_argv = ['rpm-ostree', 'compose', 'rootfs']
 
