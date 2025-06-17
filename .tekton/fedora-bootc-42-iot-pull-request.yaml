@@ -10,7 +10,7 @@ metadata:
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch
       == "main" && ( "./iot.yaml".pathChanged() || "./iot/***".pathChanged()
-      || "./minimal-plus.yaml".pathChanged() || "./minimal-plus/***".pathChanged()
+      || "./minimal-plus.hidden.yaml".pathChanged() || "./minimal-plus/***".pathChanged()
       || "./minimal.yaml".pathChanged() || "./minimal/***".pathChanged() ||
       "./fedora-includes/generic.yaml".pathChanged() || ".tekton/fedora-bootc-42-iot-pull-request.yaml".pathChanged()
       || "Containerfile".pathChanged() )

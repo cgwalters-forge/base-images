@@ -9,7 +9,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch
-      == "main" && ( "./minimal-plus.yaml".pathChanged() || "./fedora-includes/generic.yaml".pathChanged()
+      == "main" && ( "./minimal-plus.hidden.yaml".pathChanged() || "./fedora-includes/generic.yaml".pathChanged()
       || "./minimal-plus/***".pathChanged() || ".tekton/fedora-bootc-rawhide-minimal-plus-pull-request.yaml".pathChanged()
       || "Containerfile".pathChanged() )
   creationTimestamp: null

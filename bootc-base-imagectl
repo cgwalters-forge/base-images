@@ -17,7 +17,12 @@ def run_build_rootfs(args):
     Regenerates a base image using a build configuration.
     """
     target = args.target
-    manifest_path = f'/{MANIFESTDIR}/{args.manifest}.yaml'
+    for fn in [f'{args.manifest}.yaml', f'{args.manifest}.hidden.yaml']:
+        manifest_path = f'/{MANIFESTDIR}/{fn}'
+        if os.path.exists(manifest_path):
+            break
+    else:
+        raise Exception(f"manifest not found: {args.manifest}")
 
     rpmostree_argv = ['rpm-ostree', 'compose', 'rootfs']
 
@@ -116,7 +121,7 @@ def run_list(args):
     d = '/' + MANIFESTDIR
     for ent in sorted(os.listdir(d)):
         name, ext = os.path.splitext(ent)
-        if ext != '.yaml':
+        if ext != '.yaml' or name.endswith('.hidden'):
             continue
         fullpath = os.path.join(d, ent)
         if os.path.islink(fullpath):
