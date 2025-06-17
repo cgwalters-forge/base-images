@@ -8,9 +8,9 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
-      == "main" && ( "./fedora-iot.yaml".pathChanged() || "./iot/***".pathChanged()
-      || "./fedora-minimal-plus.yaml".pathChanged() || "./minimal-plus/***".pathChanged()
-      || "./fedora-minimal.yaml".pathChanged() || "./minimal/***".pathChanged() ||
+      == "main" && ( "./iot.yaml".pathChanged() || "./iot/***".pathChanged()
+      || "./minimal-plus.hidden.yaml".pathChanged() || "./minimal-plus/***".pathChanged()
+      || "./minimal.yaml".pathChanged() || "./minimal/***".pathChanged() ||
       "./fedora-includes/generic.yaml".pathChanged() || ".tekton/fedora-bootc-rawhide-iot-push.yaml".pathChanged()
       || "Containerfile".pathChanged() )
   creationTimestamp: null
