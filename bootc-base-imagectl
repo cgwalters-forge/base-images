@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import os.path as path
+import shlex
 import shutil
 import stat
 import subprocess
@@ -29,7 +30,7 @@ def run_build_rootfs(args):
     override_manifest = {}
     tmp_ostree_repo = None
     if args.install:
-        additional_pkgs = set(args.install)
+        additional_pkgs = [shlex.quote(p) for p in set(args.install)]
         if len(additional_pkgs) > 0:
             override_manifest['packages'] = list(additional_pkgs)
     if args.add_dir:
