@@ -23,7 +23,13 @@ postprocess:
     # tmpfiles.d unit for `/var/roothome` is fine, but this actually doesn't
     # work if we want to use tmpfiles.d to write to `/root/.ssh` because
     # tmpfiles gives up on that before getting to `/var/roothome`.
-    sed -i -e 's, /root, /var/roothome,' /usr/lib/tmpfiles.d/provision.conf
+    #
+    # Redirect stdout to /dev/null because of some weird stdout issue
+    # with newer rpm-ostree: https://github.com/coreos/rpm-ostree/pull/5388#issuecomment-2971623787
+    sed -i -e 's, /root, /var/roothome,' /usr/lib/tmpfiles.d/provision.conf > /dev/null
     # Because /var/roothome is also defined in rpm-ostree-0-integration.conf
     # we need to delete /var/roothome
-    sed -i -e '/^d- \/var\/roothome /d' /usr/lib/tmpfiles.d/provision.conf
+    #
+    # Redirect stdout to /dev/null because of some weird stdout issue
+    # with newer rpm-ostree: https://github.com/coreos/rpm-ostree/pull/5388#issuecomment-2971623787
+    sed -i -e '/^d- \/var\/roothome /d' /usr/lib/tmpfiles.d/provision.conf > /dev/null
