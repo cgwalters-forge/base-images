@@ -19,7 +19,7 @@
         ],
         "enabled": true,
         "groupName": "Konflux references",
-        "branchPrefix": "konflux/references/",
+        "branchPrefix": "renovate/konflux/references/",
         "group": {
           "branchTopic": "{{{baseBranch}}}",
           "commitMessageTopic": "{{{groupName}}}"
