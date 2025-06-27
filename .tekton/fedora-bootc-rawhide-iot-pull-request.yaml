@@ -15,6 +15,8 @@ metadata:
       ) && (
         ".tekton/fedora-bootc-rawhide-iot-pull-request.yaml".pathChanged() ||
         "Containerfile".pathChanged() ||
+        "bootc-base-imagectl".pathChanged() ||
+        "install-manifests".pathChanged() ||
         "fedora-includes/generic.yaml".pathChanged() ||
         "minimal.yaml".pathChanged() ||
         "minimal/***".pathChanged() ||

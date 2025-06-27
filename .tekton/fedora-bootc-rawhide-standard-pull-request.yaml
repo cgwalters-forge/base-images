@@ -15,7 +15,13 @@ metadata:
       ) && (
         ".tekton/fedora-bootc-rawhide-standard-pull-request.yaml".pathChanged() ||
         "Containerfile".pathChanged() ||
+        "bootc-base-imagectl".pathChanged() ||
+        "install-manifests".pathChanged() ||
         "fedora-includes/generic.yaml".pathChanged() ||
+        "minimal.yaml".pathChanged() ||
+        "minimal/***".pathChanged() ||
+        "minimal-plus.hidden.yaml".pathChanged() ||
+        "minimal-plus/***".pathChanged() ||
         "standard.yaml".pathChanged() ||
         "standard/***".pathChanged()
       )
