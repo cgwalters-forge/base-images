@@ -35,7 +35,7 @@ spec:
     value: true
   - name: build-args
     value:
-    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-42-compose:Fedora-42-updates-testing-20250625.0@sha256:a5a714517ded1a54ac779461cbd2b2abb32a41a594d824ff2de3e97cd1689416
+    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-42-compose:Fedora-42-updates-testing-20250627.0@sha256:4e965b1b1f361c6635252730143cdad1a14809b4823b000c01773f4161dfd398
     - MANIFEST=fedora-standard
   - name: output-image
     value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-42-standard:{{revision}}
