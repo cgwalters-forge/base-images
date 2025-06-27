@@ -4,6 +4,7 @@
     "github>platform-engineering-org/.github"
   ],
   "dependencyDashboard": true,
+  "automergeType": "branch",
   "tekton": {
     "additionalBranchPrefix": "",
     "includePaths": [

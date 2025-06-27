@@ -10,6 +10,7 @@ metadata:
     pipelinesascode.tekton.dev/on-cel-expression: |
       event == "push" &&
       (
+        target_branch.matches("renovate/.*") ||
         target_branch == "main"
       ) && (
         ".tekton/fedora-bootc-42-minimal-push.yaml".pathChanged() ||
