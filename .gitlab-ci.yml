@@ -10,6 +10,17 @@ variables:
   image: quay.io/buildah/stable:v1.40.1
   needs: []
 
+basic-checks:
+  stage: build
+  image: quay.io/fedora/fedora:latest
+  needs: []
+  script: |
+    set -xeuo pipefail
+    dnf install -y file jq python3-yaml ShellCheck
+    ./ci/find-whitespace
+    ./ci/shellcheck
+    ./ci/validate
+
 build-minimal:
   extends: .build-image
   script: |

@@ -8,6 +8,6 @@ case "${ID}" in
             rpm -q python3-libdnf5
         fi
     ;;
-    *) 
+    *)
     ;;
 esac
