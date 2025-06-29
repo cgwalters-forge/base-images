@@ -4,6 +4,7 @@
     "github>platform-engineering-org/.github"
   ],
   "dependencyDashboard": true,
+  "automergeType": "branch",
   "tekton": {
     "additionalBranchPrefix": "",
     "includePaths": [
@@ -19,7 +20,7 @@
         ],
         "enabled": true,
         "groupName": "Konflux references",
-        "branchPrefix": "konflux/references/",
+        "branchPrefix": "renovate/konflux/references/",
         "group": {
           "branchTopic": "{{{baseBranch}}}",
           "commitMessageTopic": "{{{groupName}}}"
