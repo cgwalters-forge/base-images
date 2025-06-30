@@ -20,7 +20,7 @@ metadata:
         "fedora-includes/generic.yaml".pathChanged() ||
         "minimal.yaml".pathChanged() ||
         "minimal/***".pathChanged() ||
-        "minimal-plus.hidden.yaml".pathChanged()
+        "minimal-plus.hidden.yaml".pathChanged() ||
         "minimal-plus/***".pathChanged() ||
         "iot.yaml".pathChanged() ||
         "iot/***".pathChanged()
