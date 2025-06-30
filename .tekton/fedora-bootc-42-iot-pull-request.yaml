@@ -9,9 +9,9 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: |
-      event == "pull_request" &&
       (
-        target_branch == "main"
+        (event == "pull_request" && target_branch == "main") ||
+        (event == "push" && target_branch.startsWith("renovate/"))
       ) && (
         ".tekton/fedora-bootc-42-iot-pull-request.yaml".pathChanged() ||
         "Containerfile".pathChanged() ||
@@ -20,7 +20,7 @@ metadata:
         "fedora-includes/generic.yaml".pathChanged() ||
         "minimal.yaml".pathChanged() ||
         "minimal/***".pathChanged() ||
-        "minimal-plus.hidden.yaml".pathChanged()
+        "minimal-plus.hidden.yaml".pathChanged() ||
         "minimal-plus/***".pathChanged() ||
         "iot.yaml".pathChanged() ||
         "iot/***".pathChanged()
