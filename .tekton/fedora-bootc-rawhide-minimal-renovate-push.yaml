@@ -4,15 +4,14 @@ metadata:
   annotations:
     build.appstudio.openshift.io/repo: https://gitlab.com/fedora/bootc/base-images/-/tree/{{revision}}
     build.appstudio.redhat.com/commit_sha: '{{revision}}'
-    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: |
       (
-        (event == "pull_request" && target_branch == "main")
+        (event == "push" && target_branch.startsWith("renovate/"))
       ) && (
-        ".tekton/fedora-bootc-rawhide-minimal-pull-request.yaml".pathChanged() ||
+        ".tekton/fedora-bootc-rawhide-minimal-renovate-push.yaml".pathChanged() ||
         "Containerfile".pathChanged() ||
         "bootc-base-imagectl".pathChanged() ||
         "install-manifests".pathChanged() ||
@@ -25,7 +24,8 @@ metadata:
     appstudio.openshift.io/application: fedora-bootc-rawhide
     appstudio.openshift.io/component: fedora-bootc-rawhide-minimal
     pipelines.appstudio.openshift.io/type: build
-  name: fedora-bootc-rawhide-minimal-on-pull-request
+    release.appstudio.openshift.io/auto-release: "false"
+  name: fedora-bootc-rawhide-minimal-renovate-on-push
 spec:
   params:
   - name: git-url
@@ -44,12 +44,12 @@ spec:
     value: true
   - name: build-args
     value:
-    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-rawhide-compose:Fedora-Rawhide-20250629.n.0@sha256:1f73a3262373c3e694d269913a9495cc52a01b5ea308cb3392a1da9c0ce0d791
+    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-rawhide-compose:Fedora-Rawhide-20250629.n.0@sha256:0af648e21462408f7cfa65c25feb2f44a4195e0fe710ec9e7080adda689a6687
     - MANIFEST=fedora-minimal
   - name: image-expires-after
     value: 5d
   - name: output-image
-    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-rawhide-minimal:on-pr-{{revision}}
+    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-rawhide-minimal:renovate-on-push-{{revision}}
   pipelineRef:
     params:
     - name: bundle
