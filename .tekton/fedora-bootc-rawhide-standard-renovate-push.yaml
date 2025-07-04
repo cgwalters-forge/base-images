@@ -53,7 +53,7 @@ spec:
   - name: image-expires-after
     value: 5d
   - name: output-image
-    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-rawhide-standard:renovate-on-push-{{revision}}
+    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-rawhide-standard:{{revision}}
   pipelineRef:
     params:
     - name: bundle
