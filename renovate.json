@@ -65,7 +65,10 @@
         "/quay.io\/bootc-devel\/fedora-bootc-rawhide-compose/"
       ],
       "groupName": "Fedora rawhide compose dependencies",
-      "groupSlug": "fedora-rawhide-compose-dependencies"
+      "groupSlug": "fedora-rawhide-compose-dependencies",
+      "schedule": [
+        "at any time"
+      ],
       "automerge": true
     },
     {
@@ -73,7 +76,10 @@
         "/quay.io\/bootc-devel\/fedora-bootc-42-compose/"
       ],
       "groupName": "Fedora 42 compose dependencies",
-      "groupSlug": "fedora-42-compose-dependencies"
+      "groupSlug": "fedora-42-compose-dependencies",
+      "schedule": [
+        "at any time"
+      ],
       "automerge": true
     },
     {
