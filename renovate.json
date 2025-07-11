@@ -62,16 +62,11 @@
   "packageRules": [
     {
       "matchPackageNames": [
-        "/quay.io\/bootc-devel\/fedora-bootc-.*-compose/"
-      ],
-      "automerge": true
-    },
-    {
-      "matchPackageNames": [
         "/quay.io\/bootc-devel\/fedora-bootc-rawhide-compose/"
       ],
       "groupName": "Fedora rawhide compose dependencies",
       "groupSlug": "fedora-rawhide-compose-dependencies"
+      "automerge": true
     },
     {
       "matchPackageNames": [
@@ -79,6 +74,7 @@
       ],
       "groupName": "Fedora 42 compose dependencies",
       "groupSlug": "fedora-42-compose-dependencies"
+      "automerge": true
     },
     {
       "matchPackageNames": [
