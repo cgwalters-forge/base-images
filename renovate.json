@@ -16,7 +16,7 @@
     "packageRules": [
       {
         "matchPackageNames": [
-          "/^quay.io/bootc-devel/tekton-catalog//"
+          "/^quay.io\/bootc-devel\/tekton-catalog\//"
         ],
         "enabled": true,
         "groupName": "Konflux references",
