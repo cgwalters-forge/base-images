@@ -48,6 +48,10 @@ def run_build_rootfs(args):
             override_manifest['ostree-layers'].append(f'overlay/{base}')
     if args.no_docs:
         override_manifest['documentation'] = False
+    if args.sysusers:
+        override_manifest['sysusers'] = 'compose-forced'
+        override_manifest['check-passwd'] = {'type': 'none'}
+        override_manifest['check-groups'] = {'type': 'none'}
 
     tmp_manifest = None
     if override_manifest:
@@ -148,6 +152,7 @@ if __name__ == "__main__":
     build_rootfs.add_argument("--cachedir", help="Cache repo metadata and RPMs in specified directory", action='store', default='')
     build_rootfs.add_argument("--add-dir", help='Copy dir contents into the target', action='append', default=[], metavar='DIR')
     build_rootfs.add_argument("--no-docs", help="Don't install documentation", action='store_true')
+    build_rootfs.add_argument("--sysusers", help="Run systemd-sysusers instead of injecting hardcoded passwd/group entries", action='store_true')
     build_rootfs.add_argument("source_root", help="Path to the source root directory used for dnf configuration (default=/)", nargs='?', default='/')
     build_rootfs.add_argument("target", help="Path to the target root directory that will be generated.")
     build_rootfs.set_defaults(func=run_build_rootfs)
