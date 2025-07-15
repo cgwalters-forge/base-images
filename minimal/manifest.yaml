@@ -3,6 +3,9 @@ metadata:
 
 edition: "2024"
 
+variables:
+  passwd_mode: full
+
 # Be minimal
 recommends: false
 
