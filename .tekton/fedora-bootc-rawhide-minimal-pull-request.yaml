@@ -44,7 +44,7 @@ spec:
     value: true
   - name: build-args
     value:
-    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-rawhide-compose:Fedora-Rawhide-20250714.n.0@sha256:71d2f8c8d2ed1c448c4bcd3b6af731d3e5f8e310abfc7836a6d5983ba32b253d
+    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-rawhide-compose:Fedora-Rawhide-20250715.n.2@sha256:2ca0c4f8f504a422261d20071a9e2d6503e6b24adb1691320934f8e8d7cae64e
     - MANIFEST=fedora-minimal
   - name: image-expires-after
     value: 5d
