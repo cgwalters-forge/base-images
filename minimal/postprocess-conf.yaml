@@ -24,9 +24,14 @@ etc-group-members:
   - tss # https://issues.redhat.com/browse/BIFROST-618
   - adm
 
-check-passwd:
-  type: "file"
-  filename: "passwd"
-check-groups:
-  type: "file"
-  filename: "group"
+conditional-include:
+  - if: passwd_mode == "full"
+    include: check-passwd.yaml
+  - if: passwd_mode == "nobody"
+    include: check-passwd-nobody.yaml
+  - if: passwd_mode == "none"
+    include:
+      check-passwd:
+        type: "none"
+      check-groups:
+        type: "none"
