@@ -52,6 +52,8 @@ def run_build_rootfs(args):
         override_manifest['sysusers'] = 'compose-forced'
         passwd_mode = 'nobody' if args.nobody_99 else 'none'
         override_manifest['variables'] = {'passwd_mode': passwd_mode}
+    if args.repo:
+        override_manifest['repos'] = args.repo
 
     tmp_manifest = None
     if override_manifest:
@@ -154,6 +156,7 @@ if __name__ == "__main__":
     build_rootfs.add_argument("--no-docs", help="Don't install documentation", action='store_true')
     build_rootfs.add_argument("--sysusers", help="Run systemd-sysusers instead of injecting hardcoded passwd/group entries", action='store_true')
     build_rootfs.add_argument("--nobody-99", help=argparse.SUPPRESS, action='store_true')
+    build_rootfs.add_argument("--repo", help="Enable specific repositories only", action='append', default=[], metavar='REPO')
     build_rootfs.add_argument("source_root", help="Path to the source root directory used for dnf configuration (default=/)", nargs='?', default='/')
     build_rootfs.add_argument("target", help="Path to the target root directory that will be generated.")
     build_rootfs.set_defaults(func=run_build_rootfs)
