@@ -47,7 +47,7 @@ spec:
     value: true
   - name: build-args
     value:
-    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-42-compose:Fedora-42-updates-testing-20250720.0@sha256:35258ee41c0f4fe287e95b51db57ee9e36f6f81387ba05ec30718545b7b00c17
+    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-42-compose:Fedora-42-updates-testing-20250722.0@sha256:4ae39f2892cd2bc7ca10fe8f9a70e7885375f737ac22ac65865dfd11a03447e8
     - MANIFEST=fedora-iot
   - name: output-image
     value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-42-iot:{{revision}}
