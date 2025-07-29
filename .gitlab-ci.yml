@@ -44,3 +44,4 @@ standard-build-and-test:
     (cd tests/rootfs && buildah build -t localhost/test --from localhost/fedora-bootc)
     cd tests
     buildah build -f Containerfile.test-derive --no-cache -t localhost/fedora-bootc-derived ${PRIV_ARGS} .
+    buildah build -f Containerfile.test-sysusers --no-cache -t localhost/fedora-bootc-derived ${PRIV_ARGS} .
