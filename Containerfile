@@ -28,7 +28,8 @@ ARG MANIFEST=fedora-standard
 COPY . /src
 WORKDIR /src
 RUN rm -vf /src/*.repo
-RUN --mount=type=bind,rw,from=repos,src=/,dst=/repos <<EORUN
+RUN --mount=type=cache,rw,id=bootc-base-image-cache,target=/cache \
+    --mount=type=bind,rw,from=repos,src=/,dst=/repos <<EORUN
 set -xeuo pipefail
 # Put our manifests into the builder image in the same location they'll be in the
 # final image.
@@ -39,7 +40,8 @@ install -m 0755 -t /usr/libexec ./bootc-base-imagectl
 /usr/libexec/bootc-base-imagectl list >/dev/null
 # Run the build script in the same way we expect custom images to do, and also
 # "re-inject" the manifests into the target, so secondary container builds can use it.
-/usr/libexec/bootc-base-imagectl build-rootfs --reinject --manifest=${MANIFEST} /repos /target-rootfs
+/usr/libexec/bootc-base-imagectl build-rootfs \
+    --cachedir=/cache --reinject --manifest=${MANIFEST} /repos /target-rootfs
 EORUN
 
 # This pulls in the rootfs generated in the previous step
