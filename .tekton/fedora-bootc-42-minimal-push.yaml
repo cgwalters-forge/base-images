@@ -47,6 +47,9 @@ spec:
     - MANIFEST=fedora-minimal
   - name: output-image
     value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-42-minimal:{{revision}}
+  - name: labels
+    value:
+      - org.opencontainers.image.version=42
   pipelineRef:
     params:
     - name: bundle

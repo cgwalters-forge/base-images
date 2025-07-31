@@ -49,7 +49,7 @@ spec:
     value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-43-minimal:{{revision}}
   - name: labels
     value:
-      - org.opencontainers.version=43
+      - org.opencontainers.image.version=43
   pipelineRef:
     params:
     - name: bundle
