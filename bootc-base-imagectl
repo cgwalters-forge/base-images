@@ -25,6 +25,9 @@ def run_build_rootfs(args):
     else:
         raise Exception(f"manifest not found: {args.manifest}")
 
+    # A fix for https://issues.redhat.com/browse/RHEL-108989
+    subprocess.check_call(['dnf', 'repolist'], stdout=subprocess.DEVNULL)
+
     rpmostree_argv = ['rpm-ostree', 'compose', 'rootfs']
 
     override_manifest = {}
