@@ -40,7 +40,7 @@ def run_build_rootfs(args):
         tmp_ostree_repo = tempfile.mkdtemp(dir='/var/tmp')
         subprocess.check_call(['ostree', 'init', '--repo', tmp_ostree_repo, '--mode=bare'])
         rpmostree_argv.append(f"--ostree-repo={tmp_ostree_repo}")
-        override_manifest['ostree-layers'] = []
+        override_manifest['ostree-override-layers'] = []
 
         for dir in args.add_dir:
             base = os.path.basename(dir)
@@ -48,7 +48,7 @@ def run_build_rootfs(args):
             # capture output to hide commit digest printed
             subprocess.check_output(['ostree', 'commit', '--repo', tmp_ostree_repo, '-b', f'overlay/{base}', abs,
                                      '--owner-uid=0', '--owner-gid=0', '--no-xattrs', '--mode-ro-executables'])
-            override_manifest['ostree-layers'].append(f'overlay/{base}')
+            override_manifest['ostree-override-layers'].append(f'overlay/{base}')
     if args.no_docs:
         override_manifest['documentation'] = False
     if args.sysusers:
