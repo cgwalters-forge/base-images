@@ -5,13 +5,13 @@ metadata:
     build.appstudio.openshift.io/repo: https://gitlab.com/fedora/bootc/base-images/-/tree/{{revision}}
     build.appstudio.redhat.com/commit_sha: '{{revision}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
-    pipelinesascode.tekton.dev/cancel-in-progress: "false"
+    pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: |
       (
-        (event == "push" && target_branch == "main")
+        (event == "push" && target_branch.startsWith("renovate/"))
       ) && (
-        ".tekton/fedora-bootc-43-iot-push.yaml".pathChanged() ||
+        ".tekton/fedora-bootc-43-iot-renovate-push.yaml".pathChanged() ||
         "Containerfile".pathChanged() ||
         "bootc-base-imagectl".pathChanged() ||
         "install-manifests".pathChanged() ||
@@ -28,7 +28,8 @@ metadata:
     appstudio.openshift.io/application: fedora-bootc-43
     appstudio.openshift.io/component: fedora-bootc-43-iot
     pipelines.appstudio.openshift.io/type: build
-  name: fedora-bootc-43-iot-on-push
+    release.appstudio.openshift.io/auto-release: "false"
+  name: fedora-bootc-43-iot-renovate-on-push
 spec:
   params:
   - name: git-url
@@ -49,6 +50,8 @@ spec:
     value:
     - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-43-compose:Fedora-43-202508018.n.0@sha256:3d38d19271f189aef11c0b0642ed4105c8aafba34fdf790c373e5ec321ae260a
     - MANIFEST=fedora-iot
+  - name: image-expires-after
+    value: 5d
   - name: output-image
     value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-43-iot:{{revision}}
   - name: labels
