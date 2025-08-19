@@ -4,15 +4,14 @@ metadata:
   annotations:
     build.appstudio.openshift.io/repo: https://gitlab.com/fedora/bootc/base-images/-/tree/{{revision}}
     build.appstudio.redhat.com/commit_sha: '{{revision}}'
-    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: |
       (
-        (event == "pull_request" && target_branch == "main")
+        (event == "push" && target_branch.startsWith("renovate/"))
       ) && (
-        ".tekton/fedora-bootc-43-minimal-pull-request.yaml".pathChanged() ||
+        ".tekton/fedora-bootc-43-minimal-renovate-push.yaml".pathChanged() ||
         "Containerfile".pathChanged() ||
         "bootc-base-imagectl".pathChanged() ||
         "install-manifests".pathChanged() ||
@@ -25,7 +24,8 @@ metadata:
     appstudio.openshift.io/application: fedora-bootc-43
     appstudio.openshift.io/component: fedora-bootc-43-minimal
     pipelines.appstudio.openshift.io/type: build
-  name: fedora-bootc-43-minimal-on-pull-request
+    release.appstudio.openshift.io/auto-release: "false"
+  name: fedora-bootc-43-minimal-renovate-on-push
 spec:
   params:
   - name: git-url
@@ -49,7 +49,7 @@ spec:
   - name: image-expires-after
     value: 5d
   - name: output-image
-    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-43-minimal:on-pr-{{revision}}
+    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-43-minimal:{{revision}}
   - name: labels
     value:
       - org.opencontainers.version=43
