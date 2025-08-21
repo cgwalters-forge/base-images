@@ -26,6 +26,15 @@ ARG MANIFEST=fedora-standard
 # So copy the source, and delete the hardcoded ones in git, and use the container base
 # image ones.  We can drop the ones commited to git when we hard switch to Containerfile.
 COPY . /src
+# Avoid umask/permission leakage from the outer environment; ref e.g.
+# - https://github.com/coreos/coreos-assembler/pull/4277
+# - https://gitlab.com/fedora/bootc/base-images/-/merge_requests/254
+# This invocation preserves only the executable bit, and specifically we want to remove:
+# - setuid/setgid
+# - world writability
+# NOTE: This adds world-readability, which is what we intend here as all the content
+# is public; there's no secrets in our container build.
+RUN chmod -R a=rX,u+w /src
 WORKDIR /src
 RUN rm -vf /src/*.repo
 RUN --mount=type=cache,rw,id=bootc-base-image-cache,target=/cache \
