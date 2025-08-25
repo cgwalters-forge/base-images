@@ -50,6 +50,9 @@ spec:
     value: 5d
   - name: output-image
     value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-rawhide-minimal:on-pr-{{revision}}
+  - name: labels
+    value:
+      - org.opencontainers.image.version=44
   pipelineRef:
     params:
     - name: bundle

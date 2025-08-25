@@ -52,6 +52,9 @@ spec:
     value: 5d
   - name: output-image
     value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-42-minimal-plus:{{revision}}
+  - name: labels
+    value:
+      - org.opencontainers.image.version=42
   pipelineRef:
     params:
     - name: bundle
