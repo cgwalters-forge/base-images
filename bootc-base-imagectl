@@ -11,6 +11,7 @@ import subprocess
 import sys
 import tempfile
 
+ARCH = os.uname().machine
 MANIFESTDIR = 'usr/share/doc/bootc-base-imagectl/manifests'
 
 def run_build_rootfs(args):
@@ -66,6 +67,21 @@ def run_build_rootfs(args):
         tmp_manifest.close()
         manifest_path = tmp_manifest.name
 
+    tmp_lockfile = None
+    if args.lock:
+        lockfile = {'packages': {}}
+        for nevra in args.lock:
+            # we support passing either a NEVRA or a NEVR
+            name, ev, r_or_ra = nevra.rsplit('-', 2)
+            evr_or_evra = f'{ev}-{r_or_ra}'
+            field = 'evra' if r_or_ra.endswith(('.noarch', f'.{ARCH}')) else 'evr'
+            lockfile['packages'][name] = {field: evr_or_evra}
+
+        tmp_lockfile = tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', suffix='.json', delete=False)
+        json.dump(lockfile, tmp_lockfile)
+        tmp_lockfile.close()
+        rpmostree_argv.append(f"--lockfile={tmp_lockfile.name}")
+
     try:
         if args.cachedir != "":
             rpmostree_argv.append(f"--cachedir={args.cachedir}")
@@ -94,6 +110,8 @@ def run_build_rootfs(args):
         print(f"Error executing command: {e}")
         sys.exit(1)
     finally:
+        if tmp_lockfile is not None:
+            os.unlink(tmp_lockfile.name)
         if tmp_manifest is not None:
             os.unlink(tmp_manifest.name)
         if tmp_ostree_repo:
@@ -160,6 +178,7 @@ if __name__ == "__main__":
     build_rootfs.add_argument("--sysusers", help="Run systemd-sysusers instead of injecting hardcoded passwd/group entries", action='store_true')
     build_rootfs.add_argument("--nobody-99", help=argparse.SUPPRESS, action='store_true')
     build_rootfs.add_argument("--repo", help="Enable specific repositories only", action='append', default=[], metavar='REPO')
+    build_rootfs.add_argument("--lock", help="Lock package to specific version", action='append', default=[], metavar='NEVRA')
     build_rootfs.add_argument("source_root", help="Path to the source root directory used for dnf configuration (default=/)", nargs='?', default='/')
     build_rootfs.add_argument("target", help="Path to the target root directory that will be generated.")
     build_rootfs.set_defaults(func=run_build_rootfs)
