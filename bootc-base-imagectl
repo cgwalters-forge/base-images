@@ -178,7 +178,7 @@ if __name__ == "__main__":
     build_rootfs.add_argument("--sysusers", help="Run systemd-sysusers instead of injecting hardcoded passwd/group entries", action='store_true')
     build_rootfs.add_argument("--nobody-99", help=argparse.SUPPRESS, action='store_true')
     build_rootfs.add_argument("--repo", help="Enable specific repositories only", action='append', default=[], metavar='REPO')
-    build_rootfs.add_argument("--lock", help="Lock package to specific version", action='append', default=[], metavar='NEVRA')
+    build_rootfs.add_argument("--lock", help="Lock package to specific version; can be NEVRA or NEVR", action='append', default=[], metavar='NEVRA')
     build_rootfs.add_argument("source_root", help="Path to the source root directory used for dnf configuration (default=/)", nargs='?', default='/')
     build_rootfs.add_argument("target", help="Path to the target root directory that will be generated.")
     build_rootfs.set_defaults(func=run_build_rootfs)
