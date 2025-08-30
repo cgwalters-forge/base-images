@@ -86,4 +86,4 @@ Documentation: <https://docs.fedoraproject.org/en-US/bootc/>
 [3]: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit
 [4]: https://pre-commit.com/
 [5]: https://docs.fedoraproject.org/en-US/bootc/building-containers/
-[6]: https://docs.fedoraproject.org/en-US/bootc/building-custom-base/
+[6]: https://docs.fedoraproject.org/en-US/bootc/building-from-scratch/
