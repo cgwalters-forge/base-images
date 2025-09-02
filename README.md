@@ -14,9 +14,9 @@ delivery format for base operating system updates.
 The current default user experience is to build *layered* images on top of the official
 binary base images produced and tested by this project. See the documentation[5] for more info.
 
-You can build custom base images by forking this repository; however,
-<https://gitlab.com/fedora/bootc/tracker/-/issues/32> tracks a more supportable
-mechanism that is not simply forking. For more information see[6].
+If you want total control over the image, you don't need to fork this repository.
+Instead, you can use the existing container as a "builder" to make new images.
+For more information, see the documentation[6].
 
 ## Build process
 
@@ -42,21 +42,11 @@ Fedora repos and dnf variables. E.g.:
 podman build --from quay.io/fedora/fedora:41 ...
 ```
 
-### Deriving
+## Content sets/tiers
 
-You are of course also free to fork, customize, and build base images yourself.
-See this page[6] of the documentation for more information.
-
-## Tiers
-
-At the current time, there is just one reference base image published
-to the registry. Internally the content set is split up somewhat
-into "tiers", but this is an internal implementation detail and may change
-at any time.
-
-It is planned to rework and improve this in the future, especially
-to support smaller custom images. For more on this, see
-[this tracker issue](https://gitlab.com/fedora/bootc/tracker/-/issues/32).
+Documentation above referenced the scratch[6] flow,
+but there is also a `minimal-plus` that is not exposed as a stable
+interface, but may be used by other images in Fedora.
 
 - **standard**: This image is the default, what is published as
   <https://quay.io/repository/fedora/fedora-bootc>
@@ -96,4 +86,4 @@ Documentation: <https://docs.fedoraproject.org/en-US/bootc/>
 [3]: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit
 [4]: https://pre-commit.com/
 [5]: https://docs.fedoraproject.org/en-US/bootc/building-containers/
-[6]: https://docs.fedoraproject.org/en-US/bootc/building-custom-base/
+[6]: https://docs.fedoraproject.org/en-US/bootc/building-from-scratch/
