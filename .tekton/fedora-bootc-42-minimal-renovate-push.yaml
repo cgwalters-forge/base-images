@@ -44,7 +44,7 @@ spec:
     value: true
   - name: build-args
     value:
-    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-42-compose:Fedora-42-updates-testing-20250915.0@sha256:16c83ff9156c9d0bf8ff7f55fd6da756b8228c74acb43b90bd21f56530d26aec
+    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-42-compose:Fedora-42-updates-testing-20250916.1@sha256:de2dc7e166c80be2dddef1df946d51494ffb7c00e2b78deb04c7b8ee99bf4ac4
     - MANIFEST=fedora-minimal
   - name: image-expires-after
     value: 5d
