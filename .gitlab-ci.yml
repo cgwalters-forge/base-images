@@ -7,7 +7,7 @@ variables:
 
 .build-image:
   stage: build
-  image: quay.io/buildah/stable:v1.41.4
+  image: quay.io/buildah/stable:v1.41.5
   needs: []
 
 basic-checks:
