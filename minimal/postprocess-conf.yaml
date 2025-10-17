@@ -22,6 +22,7 @@ etc-group-members:
   - wheel
   - systemd-journal
   - tss # https://issues.redhat.com/browse/BIFROST-618
+  - kvm # https://issues.redhat.com/browse/RHEL-115278
   - adm
 
 conditional-include:
