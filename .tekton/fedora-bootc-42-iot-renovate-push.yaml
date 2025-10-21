@@ -48,7 +48,7 @@ spec:
     value: true
   - name: build-args
     value:
-    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-42-compose:Fedora-42-updates-testing-20251017.0@sha256:df977df6bd103966949399f0a4bdb2bd0902f436e7c6c50f667a72186c3aec7e
+    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-42-compose:Fedora-42-updates-testing-20251020.0@sha256:cb9fb5fd2357b7b07e1f2f46743cd220da7e808331dc00972218d1711871e77e
     - MANIFEST=fedora-iot
   - name: image-expires-after
     value: 5d
