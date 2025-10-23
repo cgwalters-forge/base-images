@@ -48,7 +48,7 @@ spec:
     value: true
   - name: build-args
     value:
-    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-rawhide-compose:Fedora-Rawhide-20251022.n.0@sha256:1d4c7ca314450d01424db8f690a87169eaf1db5e7233e737f08f118d40b9daac
+    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-rawhide-compose:Fedora-Rawhide-20251023.n.0@sha256:ad7fc2e3d09ba1cd29d4319f6ee5a283ee409930ce1fa1fe1207f57a57382d66
     - MANIFEST=fedora-iot
   - name: image-expires-after
     value: 5d
