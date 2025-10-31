@@ -45,7 +45,7 @@ spec:
     value: true
   - name: build-args
     value:
-    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-rawhide-compose:Fedora-Rawhide-20251030.n.0@sha256:d899fa9289df1141e60dd467d5d189bb669173fa960bb7a5e66d9daacb0fa01a
+    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-rawhide-compose:Fedora-Rawhide-20251030.n.0@sha256:1df8227e7ad5a766fc12984de394f653a4a92ece2c1da624c6e556e952fdebfb
     - MANIFEST=fedora-minimal
   - name: output-image
     value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-rawhide-minimal:{{revision}}
