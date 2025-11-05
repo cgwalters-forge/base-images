@@ -54,6 +54,8 @@ def run_build_rootfs(args):
         override_manifest['documentation'] = False
     if args.recommends:
         override_manifest['recommends'] = True
+    if args.no_initramfs:
+        override_manifest['no-initramfs'] = True
     if args.sysusers:
         override_manifest['sysusers'] = 'compose-forced'
         passwd_mode = 'nobody' if args.nobody_99 else 'none'
@@ -178,6 +180,7 @@ if __name__ == "__main__":
     build_rootfs.add_argument("--add-dir", help='Copy dir contents into the target', action='append', default=[], metavar='DIR')
     build_rootfs.add_argument("--no-docs", help="Don't install documentation", action='store_true')
     build_rootfs.add_argument("--recommends", help="Whether to install recommended packages", action='store_true')
+    build_rootfs.add_argument("--no-initramfs", help="Whether to generate an initramfs for the roots", action='store_true')
     build_rootfs.add_argument("--sysusers", help="Run systemd-sysusers instead of injecting hardcoded passwd/group entries", action='store_true')
     build_rootfs.add_argument("--nobody-99", help=argparse.SUPPRESS, action='store_true')
     build_rootfs.add_argument("--repo", help="Enable specific repositories only", action='append', default=[], metavar='REPO')
