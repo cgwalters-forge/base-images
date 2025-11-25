@@ -24,7 +24,6 @@ packages:
   # Additional firewall support; we aren't including these in RHCOS or they
   # don't exist in RHEL
   - iptables-services
-  - WALinuxAgent-udev
   # Allow communication between sudo and SSSD
   # for caching sudo rules by SSSD.
   # https://github.com/coreos/fedora-coreos-tracker/issues/445
@@ -50,6 +49,7 @@ packages:
 # These are random architecture-specific packages
 packages-x86_64:
   - irqbalance
+  - WALinuxAgent-udev
 packages-ppc64le:
   - irqbalance
   - librtas
@@ -57,6 +57,7 @@ packages-ppc64le:
   - ppc64-diag-rtas
 packages-aarch64:
   - irqbalance
+  - WALinuxAgent-udev
 
 postprocess:
   # See: https://github.com/coreos/fedora-coreos-tracker/issues/1253
