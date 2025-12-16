@@ -6,3 +6,5 @@ postprocess:
     # Workaround for https://bugzilla.redhat.com/show_bug.cgi?id=771713
     d /var/lib/rpm-state 0755 - - -
     EOF
+    # Workaround for https://issues.redhat.com/browse/RHEL-106203
+    rm -f /usr/lib/tmpfiles.d/home.conf
