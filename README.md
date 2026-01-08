@@ -67,8 +67,9 @@ one stakeholder of each Fedora variant WGs.
 
 | Version | standard | minimal | minimal-plus |
 | ------- | -------- | ------- | ------------ |
-| Rawhide | quay.io/fedora-testing/fedora-bootc:rawhide-standard | quay.io/fedora-testing/fedora-bootc:rawhide-minimal | quay.io/fedora-testing/fedora-bootc:rawhide-minimal-plus |
-| Fedora 42 | quay.io/fedora-testing/fedora-bootc:42-standard | quay.io/fedora-testing/fedora-bootc:42-minimal | quay.io/fedora-testing/fedora-bootc:42-minimal-plus |
+| Rawhide | quay.io/bootc-devel/fedora-bootc-rawhide-standard | quay.io/bootc-devel/fedora-bootc-rawhide-minimal | quay.io/bootc-devel/fedora-bootc-rawhide-minimal-plus |
+| Fedora 43 | quay.io/bootc-devel/fedora-bootc-43-standard | quay.io/bootc-devel/fedora-bootc-43-minimal | quay.io/bootc-devel/fedora-bootc-43-minimal-plus |
+| Fedora 42 | quay.io/bootc-devel/fedora-bootc-42-standard | quay.io/bootc-devel/fedora-bootc-42-minimal | quay.io/bootc-devel/fedora-bootc-42-minimal-plus |
 
 ## More information
 
