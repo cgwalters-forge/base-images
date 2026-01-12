@@ -4,10 +4,11 @@ postprocess:
     #!/usr/bin/env bash
     set -xeuo pipefail
     source /usr/lib/os-release
+    mkdir -p /usr/lib/kernel/install.conf.d
     echo -e "# kernel-install will not try to run dracut and allow rpm-ostree to\n\
     # take over. Rpm-ostree will use this to know that it is responsible\n\
     # to run dracut and ensure that there is only one kernel in the image\n\
-    layout=ostree" | tee /usr/lib/kernel/install.conf > /dev/null
+    layout=ostree" | tee /usr/lib/kernel/install.conf.d/00-kernel-layout.conf > /dev/null
     # By default dnf keeps multiple versions of the kernel, with this
     # configuration we tell dnf to treat the kernel as everything else.
     # https://dnf.readthedocs.io/en/latest/conf_ref.html#main-options
