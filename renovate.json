@@ -55,9 +55,7 @@
     }
   ],
   "baseBranchPatterns": [
-    "main",
-    "f40",
-    "f41"
+    "main"
   ],
   "packageRules": [
     {
@@ -73,6 +71,17 @@
     },
     {
       "matchPackageNames": [
+        "/quay.io/bootc-devel/fedora-bootc-43-compose/"
+      ],
+      "groupName": "Fedora 43 compose dependencies",
+      "groupSlug": "fedora-43-compose-dependencies",
+      "schedule": [
+        "at any time"
+      ],
+      "automerge": true
+    },
+    {
+      "matchPackageNames": [
         "/quay.io/bootc-devel/fedora-bootc-42-compose/"
       ],
       "groupName": "Fedora 42 compose dependencies",
@@ -81,46 +90,6 @@
         "at any time"
       ],
       "automerge": true
-    },
-    {
-      "matchPackageNames": [
-        "/quay.io/bootc-devel/fedora-bootc-41-compose/"
-      ],
-      "groupName": "Fedora 41 compose dependencies",
-      "groupSlug": "fedora-41-compose-dependencies",
-      "schedule": [
-        "at any time"
-      ],
-      "automerge": true
-    },
-    {
-      "matchPackageNames": [
-        "/quay.io/bootc-devel/fedora-bootc-40-compose/"
-      ],
-      "groupName": "Fedora 40 compose dependencies",
-      "groupSlug": "fedora-40-compose-dependencies",
-      "schedule": [
-        "at any time"
-      ],
-      "automerge": true
-    },
-    {
-      "matchPackageNames": [
-        "quay.io/fedora/fedora"
-      ],
-      "allowedVersions": "=40",
-      "matchBaseBranches": [
-        "f40"
-      ]
-    },
-    {
-      "matchPackageNames": [
-        "quay.io/fedora/fedora"
-      ],
-      "allowedVersions": "=41",
-      "matchBaseBranches": [
-        "f41"
-      ]
     }
   ]
 }
