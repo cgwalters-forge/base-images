@@ -1,6 +1,9 @@
 # The bootc components.
 packages:
- - systemd
+ # systemd. Also name systemd-pam because it was dropped to a recommends
+ # but we still want it for handling user logins/sessions.
+ - systemd systemd-pam
+ # bootc itself.
  - bootc
  # Required by bootc install, sgdisk has been replaced by Rust crate
  # in bootc https://github.com/containers/bootc/pull/775
