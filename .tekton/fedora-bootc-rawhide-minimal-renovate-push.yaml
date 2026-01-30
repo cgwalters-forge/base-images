@@ -18,7 +18,7 @@ metadata:
         "fedora-includes/generic.yaml".pathChanged() ||
         "minimal.yaml".pathChanged() ||
         "minimal/***".pathChanged()
-      )
+      ) && true == false
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: fedora-bootc-rawhide

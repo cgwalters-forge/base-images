@@ -22,7 +22,7 @@ metadata:
         "minimal-plus/***".pathChanged() ||
         "standard.yaml".pathChanged() ||
         "standard/***".pathChanged()
-      )
+      ) && true == false
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: fedora-bootc-rawhide
