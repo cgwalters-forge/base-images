@@ -22,7 +22,7 @@ metadata:
         "minimal-plus/***".pathChanged() ||
         "iot.yaml".pathChanged() ||
         "iot/***".pathChanged()
-      )
+      ) && true == false
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: fedora-bootc-rawhide
