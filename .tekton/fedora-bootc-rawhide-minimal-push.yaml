@@ -51,7 +51,7 @@ spec:
     value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-rawhide-minimal:{{revision}}
   - name: labels
     value:
-      - org.opencontainers.image.version=44
+      - org.opencontainers.image.version=45
   pipelineRef:
     params:
     - name: bundle

@@ -4,28 +4,32 @@ metadata:
   annotations:
     build.appstudio.openshift.io/repo: https://gitlab.com/fedora/bootc/base-images/-/tree/{{revision}}
     build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: |
       (
-        (event == "push" && target_branch.startsWith("renovate/"))
+        (event == "pull_request" && target_branch == "main")
       ) && (
-        ".tekton/fedora-bootc-rawhide-minimal-renovate-push.yaml".pathChanged() ||
+        ".tekton/fedora-bootc-44-iot-pull-request.yaml".pathChanged() ||
         "Containerfile".pathChanged() ||
         "bootc-base-imagectl".pathChanged() ||
         "install-manifests".pathChanged() ||
         "fedora-includes/generic.yaml".pathChanged() ||
         "minimal.yaml".pathChanged() ||
-        "minimal/***".pathChanged()
-      ) && true == false
+        "minimal/***".pathChanged() ||
+        "minimal-plus.hidden.yaml".pathChanged() ||
+        "minimal-plus/***".pathChanged() ||
+        "iot.yaml".pathChanged() ||
+        "iot/***".pathChanged()
+      )
   creationTimestamp: null
   labels:
-    appstudio.openshift.io/application: fedora-bootc-rawhide
-    appstudio.openshift.io/component: fedora-bootc-rawhide-minimal
+    appstudio.openshift.io/application: fedora-bootc-44
+    appstudio.openshift.io/component: fedora-bootc-44-iot
     pipelines.appstudio.openshift.io/type: build
-    release.appstudio.openshift.io/auto-release: "false"
-  name: fedora-bootc-rawhide-minimal-renovate-on-push
+  name: fedora-bootc-44-iot-on-pull-request
 spec:
   params:
   - name: git-url
@@ -36,8 +40,6 @@ spec:
     value:
     - linux/amd64
     - linux/arm64
-    - linux/ppc64le
-    - linux/s390x
   - name: dockerfile
     value: Containerfile
   - name: path-context
@@ -46,15 +48,15 @@ spec:
     value: true
   - name: build-args
     value:
-    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-rawhide-compose:Fedora-Rawhide-20260209.n.0@sha256:a46fca7ce98fd36b5edb6ef96867de573479af69c645801cdc8c53ad6708114c
-    - MANIFEST=fedora-minimal
+    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-44-compose:Fedora-44-20260209.n.0@sha256:c947e0988e3f00078d3ff59eaff5ee18fe1d6fd39dc1fd15d268de0d074df45f
+    - MANIFEST=fedora-iot
   - name: image-expires-after
     value: 5d
   - name: output-image
-    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-rawhide-minimal:{{revision}}
+    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-44-iot:on-pr-{{revision}}
   - name: labels
     value:
-      - org.opencontainers.image.version=45
+      - org.opencontainers.image.version=44
   pipelineRef:
     params:
     - name: bundle
