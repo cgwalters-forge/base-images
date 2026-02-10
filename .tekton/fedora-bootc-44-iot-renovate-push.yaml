@@ -23,6 +23,7 @@ metadata:
         "iot.yaml".pathChanged() ||
         "iot/***".pathChanged()
       )
+    test.appstudio.openshift.io/comment_strategy: "disable_all"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: fedora-bootc-44
