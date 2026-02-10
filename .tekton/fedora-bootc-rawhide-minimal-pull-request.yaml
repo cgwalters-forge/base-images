@@ -20,6 +20,7 @@ metadata:
         "minimal.yaml".pathChanged() ||
         "minimal/***".pathChanged()
       )
+    test.appstudio.openshift.io/comment_strategy: "disable_all"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: fedora-bootc-rawhide
@@ -66,3 +67,5 @@ spec:
     resolver: bundles
   timeouts:
     pipeline: 6h
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-fedora-bootc-rawhide-minimal
