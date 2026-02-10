@@ -67,3 +67,5 @@ spec:
     resolver: bundles
   timeouts:
     pipeline: 6h
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-fedora-bootc-rawhide-standard
