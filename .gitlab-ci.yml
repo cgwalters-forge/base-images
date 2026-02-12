@@ -1,4 +1,15 @@
 ---
+workflow:
+  rules:
+    # Skip CI if only non-build files changed
+    - changes:
+        - renovate.json
+        - README.md
+        - LICENSE
+        - .tekton/*
+      when: never
+    - when: always
+
 stages:
   - build
 
