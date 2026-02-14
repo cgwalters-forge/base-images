@@ -1,10 +1,39 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": [
+    "Renovate configuration for bootc-base-image repository.",
+    "",
+    "This configuration separates updates into different PRs per release (e.g., Fedora 44, Rawhide)",
+    "to prevent blocking all releases if tests fail on one.",
+    "",
+    "Update schedules:",
+    "- Fedora 42 bootc-pipeline: 2-5 AM UTC daily",
+    "- Fedora 42 REPOS_IMAGE: at any time",
+    "- Fedora 43 bootc-pipeline: 2-5 AM UTC daily",
+    "- Fedora 43 REPOS_IMAGE: at any time",
+    "- Fedora 44 bootc-pipeline: 2-5 AM UTC daily",
+    "- Fedora 44 REPOS_IMAGE: at any time",
+    "- Rawhide bootc-pipeline: 2-5 AM UTC daily",
+    "- Rawhide REPOS_IMAGE: at any time",
+    "",
+    "Each update type (bootc-pipeline, REPOS_IMAGE) also has its own PR",
+    "for independent review and merge.",
+    "",
+    "rebaseWhen is set to 'never' for REPOS_IMAGE PRs because as different PRs",
+    "for each release are merged to main, automatic rebasing would reset pipelines",
+    "and cause tests to rerun multiple times. The operator can manually rebase if needed.",
+    "",
+    "Automerge is enabled for all PRs - they will be merged automatically when all checks pass."
+  ],
   "extends": [
     "github>platform-engineering-org/.github"
   ],
   "dependencyDashboard": true,
-  "automergeType": "branch",
+  "automergeType": "pr",
+  "enabledManagers": [
+    "custom.regex",
+    "tekton"
+  ],
   "tekton": {
     "additionalBranchPrefix": "",
     "includePaths": [
@@ -12,83 +41,142 @@
     ],
     "managerFilePatterns": [
       "/\\.ya?ml$/"
-    ],
-    "packageRules": [
-      {
-        "matchPackageNames": [
-          "/^quay.io/bootc-devel/tekton-catalog//"
-        ],
-        "enabled": true,
-        "groupName": "Konflux references",
-        "branchPrefix": "renovate/konflux/references/",
-        "group": {
-          "branchTopic": "{{{baseBranch}}}",
-          "commitMessageTopic": "{{{groupName}}}"
-        },
-        "commitMessageTopic": "Konflux references",
-        "prBodyColumns": [
-          "Package",
-          "Change",
-          "Notes"
-        ],
-        "prBodyTemplate": "{{{header}}}{{{table}}}{{{notes}}}{{{changelogs}}}{{{configDescription}}}{{{controls}}}{{{footer}}}",
-        "recreateWhen": "always",
-        "rebaseWhen": "behind-base-branch"
-      }
     ]
   },
+  "baseBranchPatterns": [
+    "main"
+  ],
   "customManagers": [
     {
       "customType": "regex",
       "description": [
-        "Update 'REPOS_IMAGE' and 'BUILDER_IMAGE' in tekton files"
+        "Update 'REPOS_IMAGE' in tekton files"
       ],
       "managerFilePatterns": [
         "/.tekton/.*\\.ya?ml$/"
       ],
       "matchStrings": [
-        "REPOS_IMAGE=(?<depName>.*):(?<currentValue>.*)@(?<currentDigest>.*)\\n",
-        "BUILDER_IMAGE=(?<depName>.*):(?<currentValue>.*)@(?<currentDigest>.*)\\n"
+        "REPOS_IMAGE=(?<depName>.*):(?<currentValue>.*)@(?<currentDigest>.*)\\n"
       ],
       "versioningTemplate": "regex:(?<compatibility>.*)-(?<patch>\\d{8})(\\.n)?\\.(?<build>\\d)",
       "datasourceTemplate": "docker"
     }
   ],
-  "baseBranchPatterns": [
-    "main"
-  ],
   "packageRules": [
     {
-      "matchPackageNames": [
-        "/quay.io/bootc-devel/fedora-bootc-rawhide-compose/"
-      ],
-      "groupName": "Fedora rawhide compose dependencies",
-      "groupSlug": "fedora-rawhide-compose-dependencies",
-      "schedule": [
-        "at any time"
-      ],
+      "matchManagers": ["tekton"],
+      "matchPackageNames": ["/quay.io/bootc-devel/tekton-catalog/"],
+      "matchFileNames": [".tekton/fedora-bootc-42-*"],
+      "groupName": "Fedora 42 bootc-pipeline",
+      "groupSlug": "fedora-42-bootc-pipeline",
+      "branchPrefix": "renovate/fedora-42/",
+      "commitMessageTopic": "Fedora 42 bootc build pipeline",
+      "schedule": ["after 2am and before 5am"],
+      "timezone": "UTC",
+      "recreateWhen": "always",
+      "rebaseWhen": "always",
+      "additionalBranchPrefix": "",
       "automerge": true
     },
     {
-      "matchPackageNames": [
-        "/quay.io/bootc-devel/fedora-bootc-43-compose/"
-      ],
-      "groupName": "Fedora 43 compose dependencies",
-      "groupSlug": "fedora-43-compose-dependencies",
-      "schedule": [
-        "at any time"
-      ],
+      "matchManagers": ["custom.regex"],
+      "matchPackageNames": ["/quay.io/bootc-devel/fedora-bootc-42-compose/"],
+      "matchFileNames": [".tekton/fedora-bootc-42-*"],
+      "groupName": "Fedora 42 REPOS_IMAGE",
+      "groupSlug": "fedora-42-repos-image",
+      "branchPrefix": "renovate/fedora-42/",
+      "commitMessageTopic": "Fedora 42 REPOS_IMAGE",
+      "schedule": ["at any time"],
+      "recreateWhen": "always",
+      "rebaseWhen": "never",
+      "additionalBranchPrefix": "",
       "automerge": true
     },
     {
-      "matchPackageNames": [
-        "/quay.io/bootc-devel/fedora-bootc-42-compose/"
-      ],
-      "groupName": "Fedora 42 compose dependencies",
-      "groupSlug": "fedora-42-compose-dependencies",
-      "schedule": [
-        "at any time"
-      ],
+      "matchManagers": ["tekton"],
+      "matchPackageNames": ["/quay.io/bootc-devel/tekton-catalog/"],
+      "matchFileNames": [".tekton/fedora-bootc-43-*"],
+      "groupName": "Fedora 43 bootc-pipeline",
+      "groupSlug": "fedora-43-bootc-pipeline",
+      "branchPrefix": "renovate/fedora-43/",
+      "commitMessageTopic": "Fedora 43 bootc build pipeline",
+      "schedule": ["after 2am and before 5am"],
+      "timezone": "UTC",
+      "recreateWhen": "always",
+      "rebaseWhen": "always",
+      "additionalBranchPrefix": "",
+      "automerge": true
+    },
+    {
+      "matchManagers": ["custom.regex"],
+      "matchPackageNames": ["/quay.io/bootc-devel/fedora-bootc-43-compose/"],
+      "matchFileNames": [".tekton/fedora-bootc-43-*"],
+      "groupName": "Fedora 43 REPOS_IMAGE",
+      "groupSlug": "fedora-43-repos-image",
+      "branchPrefix": "renovate/fedora-43/",
+      "commitMessageTopic": "Fedora 43 REPOS_IMAGE",
+      "schedule": ["at any time"],
+      "recreateWhen": "always",
+      "rebaseWhen": "never",
+      "additionalBranchPrefix": "",
+      "automerge": true
+    },
+    {
+      "matchManagers": ["tekton"],
+      "matchPackageNames": ["/quay.io/bootc-devel/tekton-catalog/"],
+      "matchFileNames": [".tekton/fedora-bootc-44-*"],
+      "groupName": "Fedora 44 bootc-pipeline",
+      "groupSlug": "fedora-44-bootc-pipeline",
+      "branchPrefix": "renovate/fedora-44/",
+      "commitMessageTopic": "Fedora 44 bootc build pipeline",
+      "schedule": ["after 2am and before 5am"],
+      "timezone": "UTC",
+      "recreateWhen": "always",
+      "rebaseWhen": "always",
+      "additionalBranchPrefix": "",
+      "automerge": true
+    },
+    {
+      "matchManagers": ["custom.regex"],
+      "matchPackageNames": ["/quay.io/bootc-devel/fedora-bootc-44-compose/"],
+      "matchFileNames": [".tekton/fedora-bootc-44-*"],
+      "groupName": "Fedora 44 REPOS_IMAGE",
+      "groupSlug": "fedora-44-repos-image",
+      "branchPrefix": "renovate/fedora-44/",
+      "commitMessageTopic": "Fedora 44 REPOS_IMAGE",
+      "schedule": ["at any time"],
+      "recreateWhen": "always",
+      "rebaseWhen": "never",
+      "additionalBranchPrefix": "",
+      "automerge": true
+    },
+    {
+      "matchManagers": ["tekton"],
+      "matchPackageNames": ["/quay.io/bootc-devel/tekton-catalog/"],
+      "matchFileNames": [".tekton/fedora-bootc-rawhide-*"],
+      "groupName": "Fedora Rawhide bootc-pipeline",
+      "groupSlug": "fedora-rawhide-bootc-pipeline",
+      "branchPrefix": "renovate/fedora-rawhide/",
+      "commitMessageTopic": "Fedora Rawhide bootc build pipeline",
+      "schedule": ["after 2am and before 5am"],
+      "timezone": "UTC",
+      "recreateWhen": "always",
+      "rebaseWhen": "always",
+      "additionalBranchPrefix": "",
+      "automerge": true
+    },
+    {
+      "matchManagers": ["custom.regex"],
+      "matchPackageNames": ["/quay.io/bootc-devel/fedora-bootc-rawhide-compose/"],
+      "matchFileNames": [".tekton/fedora-bootc-rawhide-*"],
+      "groupName": "Fedora Rawhide REPOS_IMAGE",
+      "groupSlug": "fedora-rawhide-repos-image",
+      "branchPrefix": "renovate/fedora-rawhide/",
+      "commitMessageTopic": "Fedora Rawhide REPOS_IMAGE",
+      "schedule": ["at any time"],
+      "recreateWhen": "always",
+      "rebaseWhen": "never",
+      "additionalBranchPrefix": "",
       "automerge": true
     }
   ]
