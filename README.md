@@ -47,6 +47,8 @@ interface, but may be used by other images in Fedora.
 
 **standard** inherits from **minimal-plus** and **minimal-plus** in turn inherit from **minimal**.
 
+- **eln** (manifest `fedora-eln`): Minimal-plus base image for Enterprise Linux Next (ELN). Uses distro `fedora` and inherits from minimal-plus; built with ELN repos. The image produced by this manifest is published as **centos-eln**.
+
 All non-trivial changes to **minimal** and **minimal-plus** should be ACKed by at least
 one stakeholder of each Fedora variant WGs.
 

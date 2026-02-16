@@ -1,0 +1,7 @@
+# ELN uses the same distro variable as Fedora: ELN is a compose of Fedora
+# Rawhide sources (see docs.fedoraproject.org/en-US/eln/). Repos come from
+# REPOS_IMAGE at build time; we do not add fedora-repos-archive here.
+variables:
+  distro: "fedora"
+
+packages: []

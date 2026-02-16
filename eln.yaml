@@ -1,0 +1,3 @@
+include:
+  - fedora-includes/eln.yaml
+  - eln/manifest.yaml
