@@ -129,6 +129,7 @@ url = "quay.io/fedora"
 
 | Repository | URL | Purpose |
 |------------|-----|---------|
+| compose-images | https://gitlab.com/fedora/bootc/compose-images | Generates images containing RPMs used by base-images |
 | base-images | https://gitlab.com/fedora/bootc/base-images | Image definitions + Tekton build pipelines |
 | tekton-catalog | https://gitlab.com/fedora/bootc/tekton-catalog | Release pipeline definitions |
 | tenants-config | https://gitlab.com/fedora/infrastructure/konflux/tenants-config | Konflux tenant configuration |
@@ -137,13 +138,24 @@ url = "quay.io/fedora"
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
+│ 0. COMPOSE IMAGES                                                    │
+│                                                                      │
+│    Source: gitlab.com/fedora/bootc/compose-images                    │
+│    Output: quay.io/bootc-devel/fedora-bootc-<version>-compose        │
+│                                                                      │
+│    These images contain the RPM repositories used by base-images.    │
+└──────────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌──────────────────────────────────────────────────────────────────────┐
 │ 1. BUILD (triggered by git push or Renovate)                         │
 │                                                                      │
 │    Source: gitlab.com/fedora/bootc/base-images                       │
 │    Pipeline: .tekton/fedora-bootc-*-push.yaml                        │
+│    Input: REPOS_IMAGE from compose-images                            │
 │                                                                      │
 │    Output: quay.io/konflux-fedora/bootc-tenant/                      │
-│            fedora-bootc-rawhide-standard:{{revision}}                │
+│            fedora-bootc-<version>-<tier>:{{revision}}                │
 └──────────────────────────────────────────────────────────────────────┘
                               │
                               ▼ (Konflux creates Snapshot)
@@ -152,79 +164,26 @@ url = "quay.io/fedora"
 │                                                                      │
 │    ReleasePlan: release-fedora-bootc-to-quay-io                      │
 │    Pipeline: push-to-external-registry                               │
-│                                                                      │
-│    Steps:                                                            │
-│    - verify-access-to-resources                                      │
-│    - apply-mapping (source → destination repos)                      │
-│    - verify-conforma (Enterprise Contract policy check)              │
-│    - push-snapshot (skopeo copy to target registry)                  │
-│    - make-repo-public                                                │
 └──────────────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌──────────────────────────────────────────────────────────────────────┐
 │ 3. OUTPUT                                                            │
 │                                                                      │
-│    quay.io/bootc-devel/fedora-bootc-rawhide-standard                 │
-│    quay.io/bootc-devel/fedora-bootc-rawhide-minimal                  │
-│    quay.io/bootc-devel/fedora-bootc-rawhide-minimal-plus             │
-│    quay.io/bootc-devel/fedora-bootc-rawhide-iot                      │
-│    quay.io/bootc-devel/fedora-bootc-rawhide-compose                  │
+│    quay.io/bootc-devel/fedora-bootc-<version>-standard               │
+│    quay.io/bootc-devel/fedora-bootc-<version>-minimal                │
+│    quay.io/bootc-devel/fedora-bootc-<version>-minimal-plus           │
+│    quay.io/bootc-devel/fedora-bootc-<version>-iot                    │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Image Tiers
 
-| Tier | Description | Inherits From |
-|------|-------------|---------------|
-| `minimal` | Minimal bootable base | - |
-| `minimal-plus` | Shared base for Fedora image-based variants | minimal |
-| `standard` | Full generic base image | minimal-plus |
-| `iot` | IoT-specific variant | minimal-plus |
+See the [README](README.md) for details on the different image tiers (minimal, minimal-plus, standard, iot).
 
 ### Renovate Automation
 
-| Dependency | Schedule | Purpose |
-|------------|----------|---------|
-| `REPOS_IMAGE` | At any time | Updates compose image reference |
-| `bootc-pipeline` | 2-5 AM UTC daily | Updates Tekton pipeline |
-
-Both are auto-merged when tests pass.
-
-### Key Configuration Files
-
-#### 1. Build Pipeline
-
-**File:** `base-images/.tekton/fedora-bootc-rawhide-standard-push.yaml`
-
-```yaml
-params:
-  - name: build-args
-    value:
-      - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-rawhide-compose:...
-      - MANIFEST=fedora-standard
-  - name: output-image
-    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-rawhide-standard:{{revision}}
-```
-
-#### 2. ReleasePlan (promotion mapping)
-
-**File:** `tenants-config/cluster/kfluxfedorap01/bootc-tenant/applications/fedora-bootc/rawhide/releaseplans/release-to-quay-io/kustomization.yaml`
-
-```yaml
-- op: replace
-  path: /spec/data/mapping/components
-  value:
-    - name: fedora-bootc-rawhide-standard
-      repository: quay.io/bootc-devel/fedora-bootc-rawhide-standard
-    - name: fedora-bootc-rawhide-minimal
-      repository: quay.io/bootc-devel/fedora-bootc-rawhide-minimal
-    # ...
-```
-
-#### 3. Release Pipeline
-
-**File:** `tekton-catalog/pipelines/push-to-external-registry/push-to-external-registry.yaml`
+Renovate automatically updates dependencies. See the description comments in [renovate.json](renovate.json) for scheduling and configuration details.
 
 ### Common Changes (Development)
 
@@ -242,99 +201,51 @@ params:
 
 This section describes how to add a new Fedora version or remove an EOL version from Konflux.
 
-**Example scenario:** Fedora 42 is going EOL and needs to be removed. Rawhide is becoming Fedora 46, so we need to add Fedora 45 (the new branched release).
+**Example scenario:** Fedora 42 is going EOL and needs to be removed. Rawhide (F45) is branching, so we need to add Fedora 44 as the new branched release.
 
 ### Adding a New Fedora Version to Konflux
 
-When Rawhide branches to a new Fedora version (e.g., Rawhide → F46, creating F45 as branched), follow these steps:
+#### Step 1: Add Release to compose-images Repo
 
-#### Step 1: Create Tekton Pipelines (base-images repo)
+**Repository:** https://gitlab.com/fedora/bootc/compose-images
 
-Create 12 new pipeline files in `.tekton/` by copying from an existing version (e.g., F44):
+Add the new release definition so that compose images are generated for the new version. This must be done first as base-images depends on these compose images.
 
-```bash
-cd base-images/.tekton/
+1. Create new Tekton pipelines in `.tekton/` for the new version (copy from existing version)
+2. Update `RELEASEVER`, `COMPOSE_BRANCHED`, and labels in the new pipelines
+3. Add a package rule for the new version in `renovate.json`
 
-# For each tier (minimal, minimal-plus, standard, iot) and type (push, pull-request, renovate-push):
-for tier in minimal minimal-plus standard iot; do
-  for type in push pull-request renovate-push; do
-    cp fedora-bootc-44-${tier}-${type}.yaml fedora-bootc-45-${tier}-${type}.yaml
-  done
-done
-```
+See [MR !187](https://gitlab.com/fedora/bootc/compose-images/-/merge_requests/187) for reference (F44 addition).
 
-Then update each file, replacing:
-- `fedora-bootc-44` → `fedora-bootc-45`
-- `appstudio.openshift.io/application: fedora-bootc-44` → `fedora-bootc-45`
-- `appstudio.openshift.io/component: fedora-bootc-44-*` → `fedora-bootc-45-*`
-- `REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-44-compose:...` → `fedora-bootc-45-compose:...`
-- `output-image: .../fedora-bootc-44-*` → `fedora-bootc-45-*`
-- `org.opencontainers.image.version=44` → `45`
+#### Step 2: Create Tekton Pipelines (base-images repo)
 
-#### Step 2: Update Renovate Configuration (base-images repo)
+**Repository:** https://gitlab.com/fedora/bootc/base-images
 
-Add package rules for the new version in `renovate.json`:
+Copy the current release pipelines to the new version and update rawhide for the next version.
 
-```json
-{
-  "matchManagers": ["tekton"],
-  "matchPackageNames": ["/quay.io/bootc-devel/tekton-catalog/"],
-  "matchFileNames": [".tekton/fedora-bootc-45-*"],
-  "groupName": "Fedora 45 bootc-pipeline",
-  "groupSlug": "fedora-45-bootc-pipeline",
-  "branchPrefix": "renovate/fedora-45/",
-  "commitMessageTopic": "Fedora 45 bootc build pipeline",
-  "schedule": ["after 2am and before 5am"],
-  "timezone": "UTC",
-  "recreateWhen": "always",
-  "rebaseWhen": "always",
-  "additionalBranchPrefix": "",
-  "automerge": true
-},
-{
-  "matchManagers": ["custom.regex"],
-  "matchPackageNames": ["/quay.io/bootc-devel/fedora-bootc-45-compose/"],
-  "matchFileNames": [".tekton/fedora-bootc-45-*"],
-  "groupName": "Fedora 45 REPOS_IMAGE",
-  "groupSlug": "fedora-45-repos-image",
-  "branchPrefix": "renovate/fedora-45/",
-  "commitMessageTopic": "Fedora 45 REPOS_IMAGE",
-  "schedule": ["at any time"],
-  "recreateWhen": "always",
-  "rebaseWhen": "never",
-  "additionalBranchPrefix": "",
-  "automerge": true
-}
-```
+See the code snippets used for F44 in [MR !363 comment](https://gitlab.com/fedora/bootc/base-images/-/merge_requests/363#note_3071603283) for reference.
 
-#### Step 3: Create Tenant Configuration (tenants-config repo)
+#### Step 3: Update Renovate Configuration (base-images repo)
 
-Create the new version directory structure:
+Add package rules for the new version in `renovate.json`. See the existing rules for other versions as a template.
+
+#### Step 4: Create Tenant Configuration (tenants-config repo)
+
+**Repository:** https://gitlab.com/fedora/infrastructure/konflux/tenants-config
 
 ```bash
-cd tenants-config/cluster/kfluxfedorap01/bootc-tenant/applications/fedora-bootc/
+cd cluster/kfluxfedorap01/bootc-tenant/applications/fedora-bootc/
+NEW_RELEASE=44
 
-# Copy from existing version
-cp -r 44 45
+# Copy from rawhide
+cp -r rawhide $NEW_RELEASE
+
+# Update version references
+sed -i "s/rawhide/$NEW_RELEASE/g" $NEW_RELEASE/**/*.yaml
+sed -i "s/compose-rawhide-id/compose-branched-id/" $NEW_RELEASE/releaseplans/release-to-quay-io/kustomization.yaml
 ```
 
-Update files in the new `45/` directory:
-
-1. **`releaseplans/release-to-quay-io/kustomization.yaml`** - Update component names:
-   ```yaml
-   value:
-     - name: fedora-bootc-45-compose
-       repository: quay.io/bootc-devel/fedora-bootc-45-compose
-       tags:
-         - "{{ labels.compose-branched-id }}"
-     - name: fedora-bootc-45-minimal
-       repository: quay.io/bootc-devel/fedora-bootc-45-minimal
-     # ... etc
-   ```
-
-2. **All kustomization files** - Ensure paths reference the correct version
-
-#### Step 4: Register the New Version (tenants-config repo)
+#### Step 5: Register the New Version (tenants-config repo)
 
 Add the new version to `fedora-bootc/kustomization.yaml`:
 
@@ -343,16 +254,10 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - "rawhide"
-  - "45"      # <-- Add new version
-  - "44"
+  - "44"      # <-- Add new version
   - "43"
+  - "42"
 ```
-
-#### Step 5: Initial REPOS_IMAGE
-
-The new pipelines need a valid `REPOS_IMAGE`. Either:
-- Wait for Renovate to detect and update it automatically
-- Manually set an initial compose image reference in the tekton files
 
 ### Removing an EOL Fedora Version from Konflux
 
@@ -360,49 +265,41 @@ When a Fedora version reaches EOL (e.g., F42), follow these steps:
 
 #### Step 1: Remove Tekton Pipelines (base-images repo)
 
-Delete the pipeline files for the EOL version:
+**Repository:** https://gitlab.com/fedora/bootc/base-images
 
 ```bash
-cd base-images/.tekton/
-rm fedora-bootc-42-*.yaml
+cd .tekton/
+git rm fedora-bootc-42-*.yaml
 ```
 
 #### Step 2: Remove Renovate Rules (base-images repo)
 
-Remove the package rules for F42 from `renovate.json`:
-
-```json
-// Remove these two blocks:
-{
-  "matchManagers": ["tekton"],
-  "matchFileNames": [".tekton/fedora-bootc-42-*"],
-  ...
-},
-{
-  "matchManagers": ["custom.regex"],
-  "matchPackageNames": ["/quay.io/bootc-devel/fedora-bootc-42-compose/"],
-  ...
-}
-```
+Remove the package rules for F42 from `renovate.json` (the two blocks matching `fedora-bootc-42-*`).
 
 #### Step 3: Remove Tenant Configuration (tenants-config repo)
 
-Remove the version from `fedora-bootc/kustomization.yaml`:
+**Repository:** https://gitlab.com/fedora/infrastructure/konflux/tenants-config
 
-```yaml
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-  - "rawhide"
-  - "45"
-  - "44"
-  - "43"
-  # - "42"  <-- Remove this line
-```
-
-Then delete the version directory:
+Remove the version from `fedora-bootc/kustomization.yaml` and delete the directory:
 
 ```bash
-cd tenants-config/cluster/kfluxfedorap01/bootc-tenant/applications/fedora-bootc/
+cd cluster/kfluxfedorap01/bootc-tenant/applications/fedora-bootc/
+
+# Edit kustomization.yaml to remove "42" from resources
+
+# Delete the version directory
 rm -rf 42/
 ```
+
+#### Step 4: Remove from compose-images Repo
+
+**Repository:** https://gitlab.com/fedora/bootc/compose-images
+
+Remove the EOL release pipelines and renovate rules:
+
+```bash
+cd .tekton/
+git rm fedora-bootc-42-compose-*.yaml
+```
+
+Also remove the package rule for F42 from `renovate.json` (the block matching `fedora-42-.*-compose`).
