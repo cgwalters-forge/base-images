@@ -233,6 +233,176 @@ params:
 | Add new component | `tenants-config/.../components/` |
 | Change destination registry | `tenants-config/.../releaseplans/release-to-quay-io/` |
 | Modify release pipeline | `tekton-catalog/pipelines/push-to-external-registry/` |
-| Add new Fedora version | Create new version directory under `tenants-config/.../fedora-bootc/` |
+| Add new Fedora version | See [Adding a New Fedora Version](#adding-a-new-fedora-version-to-konflux) |
+| Remove EOL Fedora version | See [Removing an EOL Fedora Version](#removing-an-eol-fedora-version-from-konflux) |
 
 ---
+
+## Part 3: Managing Fedora Versions in Konflux
+
+This section describes how to add a new Fedora version or remove an EOL version from Konflux.
+
+**Example scenario:** Fedora 42 is going EOL and needs to be removed. Rawhide is becoming Fedora 46, so we need to add Fedora 45 (the new branched release).
+
+### Adding a New Fedora Version to Konflux
+
+When Rawhide branches to a new Fedora version (e.g., Rawhide → F46, creating F45 as branched), follow these steps:
+
+#### Step 1: Create Tekton Pipelines (base-images repo)
+
+Create 12 new pipeline files in `.tekton/` by copying from an existing version (e.g., F44):
+
+```bash
+cd base-images/.tekton/
+
+# For each tier (minimal, minimal-plus, standard, iot) and type (push, pull-request, renovate-push):
+for tier in minimal minimal-plus standard iot; do
+  for type in push pull-request renovate-push; do
+    cp fedora-bootc-44-${tier}-${type}.yaml fedora-bootc-45-${tier}-${type}.yaml
+  done
+done
+```
+
+Then update each file, replacing:
+- `fedora-bootc-44` → `fedora-bootc-45`
+- `appstudio.openshift.io/application: fedora-bootc-44` → `fedora-bootc-45`
+- `appstudio.openshift.io/component: fedora-bootc-44-*` → `fedora-bootc-45-*`
+- `REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-44-compose:...` → `fedora-bootc-45-compose:...`
+- `output-image: .../fedora-bootc-44-*` → `fedora-bootc-45-*`
+- `org.opencontainers.image.version=44` → `45`
+
+#### Step 2: Update Renovate Configuration (base-images repo)
+
+Add package rules for the new version in `renovate.json`:
+
+```json
+{
+  "matchManagers": ["tekton"],
+  "matchPackageNames": ["/quay.io/bootc-devel/tekton-catalog/"],
+  "matchFileNames": [".tekton/fedora-bootc-45-*"],
+  "groupName": "Fedora 45 bootc-pipeline",
+  "groupSlug": "fedora-45-bootc-pipeline",
+  "branchPrefix": "renovate/fedora-45/",
+  "commitMessageTopic": "Fedora 45 bootc build pipeline",
+  "schedule": ["after 2am and before 5am"],
+  "timezone": "UTC",
+  "recreateWhen": "always",
+  "rebaseWhen": "always",
+  "additionalBranchPrefix": "",
+  "automerge": true
+},
+{
+  "matchManagers": ["custom.regex"],
+  "matchPackageNames": ["/quay.io/bootc-devel/fedora-bootc-45-compose/"],
+  "matchFileNames": [".tekton/fedora-bootc-45-*"],
+  "groupName": "Fedora 45 REPOS_IMAGE",
+  "groupSlug": "fedora-45-repos-image",
+  "branchPrefix": "renovate/fedora-45/",
+  "commitMessageTopic": "Fedora 45 REPOS_IMAGE",
+  "schedule": ["at any time"],
+  "recreateWhen": "always",
+  "rebaseWhen": "never",
+  "additionalBranchPrefix": "",
+  "automerge": true
+}
+```
+
+#### Step 3: Create Tenant Configuration (tenants-config repo)
+
+Create the new version directory structure:
+
+```bash
+cd tenants-config/cluster/kfluxfedorap01/bootc-tenant/applications/fedora-bootc/
+
+# Copy from existing version
+cp -r 44 45
+```
+
+Update files in the new `45/` directory:
+
+1. **`releaseplans/release-to-quay-io/kustomization.yaml`** - Update component names:
+   ```yaml
+   value:
+     - name: fedora-bootc-45-compose
+       repository: quay.io/bootc-devel/fedora-bootc-45-compose
+       tags:
+         - "{{ labels.compose-branched-id }}"
+     - name: fedora-bootc-45-minimal
+       repository: quay.io/bootc-devel/fedora-bootc-45-minimal
+     # ... etc
+   ```
+
+2. **All kustomization files** - Ensure paths reference the correct version
+
+#### Step 4: Register the New Version (tenants-config repo)
+
+Add the new version to `fedora-bootc/kustomization.yaml`:
+
+```yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - "rawhide"
+  - "45"      # <-- Add new version
+  - "44"
+  - "43"
+```
+
+#### Step 5: Initial REPOS_IMAGE
+
+The new pipelines need a valid `REPOS_IMAGE`. Either:
+- Wait for Renovate to detect and update it automatically
+- Manually set an initial compose image reference in the tekton files
+
+### Removing an EOL Fedora Version from Konflux
+
+When a Fedora version reaches EOL (e.g., F42), follow these steps:
+
+#### Step 1: Remove Tekton Pipelines (base-images repo)
+
+Delete the pipeline files for the EOL version:
+
+```bash
+cd base-images/.tekton/
+rm fedora-bootc-42-*.yaml
+```
+
+#### Step 2: Remove Renovate Rules (base-images repo)
+
+Remove the package rules for F42 from `renovate.json`:
+
+```json
+// Remove these two blocks:
+{
+  "matchManagers": ["tekton"],
+  "matchFileNames": [".tekton/fedora-bootc-42-*"],
+  ...
+},
+{
+  "matchManagers": ["custom.regex"],
+  "matchPackageNames": ["/quay.io/bootc-devel/fedora-bootc-42-compose/"],
+  ...
+}
+```
+
+#### Step 3: Remove Tenant Configuration (tenants-config repo)
+
+Remove the version from `fedora-bootc/kustomization.yaml`:
+
+```yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - "rawhide"
+  - "45"
+  - "44"
+  - "43"
+  # - "42"  <-- Remove this line
+```
+
+Then delete the version directory:
+
+```bash
+cd tenants-config/cluster/kfluxfedorap01/bootc-tenant/applications/fedora-bootc/
+rm -rf 42/
+```
