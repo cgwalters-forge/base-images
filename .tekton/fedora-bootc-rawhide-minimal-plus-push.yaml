@@ -67,4 +67,4 @@ spec:
   timeouts:
     pipeline: 6h
   taskRunTemplate:
-    serviceAccountName: build-pipeline-fedora-bootc-rawhide-minimal
+    serviceAccountName: build-pipeline-fedora-bootc-rawhide-minimal-plus
