@@ -64,6 +64,15 @@
   ],
   "packageRules": [
     {
+      "description": [
+        "Disable REPOS_IMAGE updates for 44-iot and rawhide-iot tekton files",
+        "until we fix https://gitlab.com/fedora/bootc/base-images/-/issues/74"
+      ],
+      "matchManagers": ["custom.regex"],
+      "matchFileNames": [".tekton/*-44-iot-*", ".tekton/*-rawhide-iot-*"],
+      "enabled": false
+    },
+    {
       "matchManagers": ["tekton"],
       "matchPackageNames": ["/quay.io/bootc-devel/tekton-catalog/"],
       "matchFileNames": [".tekton/fedora-bootc-42-*"],
