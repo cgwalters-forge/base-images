@@ -49,7 +49,7 @@ spec:
     value: true
   - name: build-args
     value:
-    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-rawhide-compose:Fedora-Rawhide-20260209.n.0@sha256:a46fca7ce98fd36b5edb6ef96867de573479af69c645801cdc8c53ad6708114c
+    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-rawhide-compose:Fedora-Rawhide-20260218.n.0@sha256:fb0e5c835e7239ab4d372c8b5fa381bc1e019c5b1b44eade626ee96b1fca3046
     - MANIFEST=fedora-minimal-plus
   - name: image-expires-after
     value: 5d
@@ -70,4 +70,4 @@ spec:
   timeouts:
     pipeline: 6h
   taskRunTemplate:
-    serviceAccountName: build-pipeline-fedora-bootc-rawhide-minimal
+    serviceAccountName: build-pipeline-fedora-bootc-rawhide-minimal-plus

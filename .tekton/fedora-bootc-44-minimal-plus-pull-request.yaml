@@ -70,4 +70,4 @@ spec:
   timeouts:
     pipeline: 6h
   taskRunTemplate:
-    serviceAccountName: build-pipeline-fedora-bootc-44-minimal
+    serviceAccountName: build-pipeline-fedora-bootc-44-minimal-plus
