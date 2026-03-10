@@ -1,5 +1,6 @@
 repos:
-  - fedora-eln
+  - eln-baseos
+  - eln-appstream 
 include:
   - fedora-includes/eln.yaml
   - eln/manifest.yaml
