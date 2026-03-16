@@ -18,28 +18,17 @@ If you want total control over the image, you don't need to fork this repository
 Instead, you can use the existing container as a "builder" to make new images.
 For more information, see the documentation[6].
 
-## Build process
+## Contributing
 
-Building the images in this repo can be done with `podman build`, but
-note the build process uses a special podman-ecosystem specific mechanism
-to create fully custom images while inside a `Containerfile`.
-You need to enable some privileges as nested containerization is required.
-
-```bash
-podman build --security-opt=label=disable --cap-add=all \
-  --device /dev/fuse -t localhost/fedora-bootc .
-```
-
-See the `Containerfile` for more details. This builds the default `standard` image.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full development workflow.
 
 ## Fedora versions
 
 By default, the base images are built for Fedora rawhide. To build against a
-different Fedora version, you can override the `FROM` image used to obtain the
-Fedora repos and dnf variables. E.g.:
+different Fedora version:
 
 ```bash
-podman build --from quay.io/fedora/fedora:41 ...
+FEDORA_VERSION=43 just build
 ```
 
 ## Content sets/tiers
@@ -69,7 +58,6 @@ one stakeholder of each Fedora variant WGs.
 | ------- | -------- | ------- | ------------ |
 | Rawhide | quay.io/bootc-devel/fedora-bootc-rawhide-standard | quay.io/bootc-devel/fedora-bootc-rawhide-minimal | quay.io/bootc-devel/fedora-bootc-rawhide-minimal-plus |
 | Fedora 43 | quay.io/bootc-devel/fedora-bootc-43-standard | quay.io/bootc-devel/fedora-bootc-43-minimal | quay.io/bootc-devel/fedora-bootc-43-minimal-plus |
-| Fedora 42 | quay.io/bootc-devel/fedora-bootc-42-standard | quay.io/bootc-devel/fedora-bootc-42-minimal | quay.io/bootc-devel/fedora-bootc-42-minimal-plus |
 
 ## More information
 
