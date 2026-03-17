@@ -10,7 +10,7 @@ postprocess:
     # Dracut will always fail to set security.selinux xattrs at build time
     # https://github.com/dracut-ng/dracut-ng/issues/1561
     export DRACUT_NO_XATTR=1
-    add_dracutmodules+=" kernel-modules dracut-systemd systemd-initrd base ostree "
+    add_dracutmodules+=" kernel-modules dracut-systemd systemd-initrd base ostree bootc "
     EOF
     cat > /usr/lib/dracut/dracut.conf.d/22-bootc-generic.conf << 'EOF'
     # Extra modules that we want by default that are known to exist in the kernel
