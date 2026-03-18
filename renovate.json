@@ -156,6 +156,17 @@
       "rebaseWhen": "never",
       "additionalBranchPrefix": "",
       "automerge": true
+    },
+    {
+      "matchPackageNames": [
+        "/quay.io/bootc-devel/fedora-bootc-eln-compose/"
+      ],
+      "groupName": "Fedora ELN compose dependencies",
+      "groupSlug": "fedora-eln-compose-dependencies",
+      "schedule": [
+        "at any time"
+      ],
+      "automerge": true
     }
   ]
 }
