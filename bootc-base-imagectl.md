@@ -47,6 +47,15 @@ This command takes just two arguments:
 - A path to the target root filesystem which will be generated as
   a directory. The target should not already exist (but its parent must exist).
 
+### Implementation
+
+The current implementation uses `rpm-ostree` on a manifest (treefile)
+embedded in the container image itself. These manifests are not intended
+to be editable directly.
+
+To emphasize: the implementation of this command (especially the configuration
+files that it reads) are subject to change.
+
 ## Using bootc-base-imagectl rechunk
 
 This operation is strongly related to `build-rootfs` but is also orthogonal;
@@ -95,6 +104,35 @@ tree (hence removed/overridden files are handled), and then splits it up
 Further, because bootc uses OSTree today, and OSTree canonializes all timestamps
 to zero on the client side, this tool does that at build time.
 
+### Using chunkah instead of rpm-ostree
+
+The `--chunkah` flag switches rechunk to use [chunkah] instead of
+rpm-ostree for layer splitting. In this mode, chunkah reads the rootfs
+from `/chunkah` (its default) and writes an OCI archive to stdout.
+The `from_image` and `to_image` positional arguments are not used.
+The `--max-layers` option is respected and passed through to chunkah.
+
+This mode automatically passes `--prune /sysroot/` to strip OSTree data
+and `--label ostree.commit-` / `--label ostree.final-diffid-` to remove
+OSTree-specific labels. In other words, this produces plain OCI bootc images
+without any OSTree content.
+
+To rechunk an existing image using chunkah:
+
+```
+IMG=quay.io/exampleos/exampleos:latest
+podman run --rm --mount=type=image,src=$IMG,dest=/chunkah \
+  -e CHUNKAH_CONFIG_STR="$(podman inspect $IMG)" \
+  quay.io/fedora/fedora-bootc:rawhide \
+  /usr/libexec/bootc-base-imagectl rechunk --chunkah | podman load
+```
+
+The `CHUNKAH_CONFIG_STR` environment variable passes the original
+image's metadata (labels, environment, command, etc.) to chunkah so
+that it is retained in the rechunked output.
+
+[chunkah]: https://github.com/coreos/chunkah
+
 ### Other options
 
 `bootc-base-imagectl list` will enumerate available configurations that
@@ -102,12 +140,9 @@ can be selected by passing `--manifest` to `build-rootfs`.
 
 ### Implementation
 
-The current implementation uses `rpm-ostree` on a manifest (treefile)
-embedded in the container image itself. These manifests are not intended
-to be editable directly.
-
-To emphasize: the implementation of this command (especially the configuration
-files that it reads) are subject to change.
+The default rechunking implementation also uses `rpm-ostree`. The `--chunkah`
+mode uses [chunkah] instead, which is content-agnostic and not tied to
+rpm-ostree.
 
 ### Cross builds and the builder image
 
