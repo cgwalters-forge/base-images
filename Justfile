@@ -23,6 +23,7 @@ _build_cmd := builder + " build"
 _tag := image + if tier == "standard" { "" } else { ":" + tier }
 _base_image := "quay.io/fedora/fedora:" + fedora_version
 _version_args := if fedora_version == "rawhide" { "" } else { "--build-arg=REPOS_IMAGE=" + _base_image + " --build-arg=BUILDER_IMAGE=" + _base_image }
+_chunkah_args := "--build-arg FINAL=chunked --skip-unused-stages=false -v " + justfile_directory() + ":/run/src"
 
 # ============================================================================
 # Core targets
@@ -30,10 +31,12 @@ _version_args := if fedora_version == "rawhide" { "" } else { "--build-arg=REPOS
 
 # Build the container image
 [group('core')]
-build: _check-tier
+[arg("chunkah", long, value="true")]
+build chunkah="": _check-tier
     {{_build_cmd}} -f Containerfile --no-cache \
         -t {{_tag}} {{priv_args}} \
         {{_version_args}} {{builder_extra}} \
+        {{if chunkah != "" { _chunkah_args } else { "" }}} \
         --build-arg=MANIFEST=fedora-{{tier}} .
 
 # Build and test
