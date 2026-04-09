@@ -20,7 +20,7 @@ stages:
 
 variables:
   BUILDER: buildah
-  JUST_VERSION: "1.40.0"
+  JUST_VERSION: "1.49.0"
 
 .build-image:
   stage: build

@@ -2,9 +2,11 @@
 # nested containerization, so you must build with e.g.
 # podman build --security-opt=label=disable --cap-add=all --device /dev/fuse <...>
 
-# NOTE: This container build will output a single giant layer. It is strongly recommended
-# to run the "rechunker" on the output of this build, see
-# https://coreos.github.io/rpm-ostree/experimental-build-chunked-oci/
+# NOTE: This container build will output a single giant layer. You can either
+# run the "rechunker" on the output of this build (see bootc-base-imagectl.md),
+# or build the split version directly with `just build --chunkah`
+# (or if using podman/buildah directly, add `--build-arg FINAL=chunked
+# --skip-unused-stages=false -v $PWD:/run/src`).
 
 # Override this repos container to control the base image package versions. For
 # example, podman build --from=quay.io/fedora/fedora:41 will get you a system
@@ -14,8 +16,10 @@
 # since konflux doesn't yet support --from.
 ARG REPOS_IMAGE=quay.io/fedora/fedora:rawhide
 ARG BUILDER_IMAGE=quay.io/fedora/fedora:rawhide
-FROM $REPOS_IMAGE as repos
+# Either 'unchunked' or 'chunked'. Determines whether we take the chunkah path.
+ARG FINAL=unchunked
 
+FROM $REPOS_IMAGE as repos
 # BOOTSTRAPPING: This can be any image that has rpm-ostree, selinux-policy-targeted
 #                and python3 (for bootc-base-imagectl).
 FROM $BUILDER_IMAGE as builder
@@ -54,9 +58,19 @@ install -m 0755 -t /usr/libexec ./bootc-base-imagectl
 EORUN
 
 # This pulls in the rootfs generated in the previous step
-FROM scratch
+FROM scratch AS unchunked
 COPY --from=builder /target-rootfs/ /
 
+FROM builder AS rechunker
+RUN dnf -y install chunkah
+ARG CHUNKAH_ARGS=""
+RUN --mount=from=unchunked,src=/,target=/chunkah,ro \
+    --mount=type=bind,target=/run/src,rw \
+    /usr/libexec/bootc-base-imagectl rechunk --chunkah ${CHUNKAH_ARGS} \
+    > /run/src/out.ociarchive
+FROM oci-archive:out.ociarchive AS chunked
+
+FROM $FINAL
 LABEL containers.bootc 1
 # This is an ad-hoc way for us to reference bootc-image-builder in
 # a way that in theory client tooling can inspect and find. Today

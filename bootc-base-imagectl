@@ -135,22 +135,40 @@ def run_build_rootfs(args):
             shutil.copy('/' + f, dst)
 
 def run_rechunk(args):
-    argv = [
-            'rpm-ostree',
-            'experimental',
-            'compose',
-            'build-chunked-oci']
-    if args.max_layers is not None:
-        argv.append(f"--max-layers={args.max_layers}")
-    argv.extend(['--bootc',
-            '--format-version=1',
-            f'--from={args.from_image}',
-            f'--output=containers-storage:{args.to_image}'])
-    try:
-        subprocess.run(argv, check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Error executing command: {e}")
-        sys.exit(1)
+    if args.chunkah:
+        argv = ['chunkah', 'build', '--rootfs=/chunkah']
+        if args.max_layers is not None:
+            argv.append(f"--max-layers={args.max_layers}")
+        # Strip OSTree data and labels for bootc compatibility; see
+        # https://github.com/coreos/chunkah#compatibility-with-bootable-bootc-images
+        argv.extend(['--prune', '/sysroot/',
+                '--label', 'ostree.commit-',
+                '--label', 'ostree.final-diffid-'])
+        try:
+            subprocess.run(argv, check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Error executing command: {e}", file=sys.stderr)
+            sys.exit(1)
+    else:
+        if not args.from_image or not args.to_image:
+            print("Error: from_image and to_image are required when not using --chunkah", file=sys.stderr)
+            sys.exit(1)
+        argv = [
+                'rpm-ostree',
+                'experimental',
+                'compose',
+                'build-chunked-oci']
+        if args.max_layers is not None:
+            argv.append(f"--max-layers={args.max_layers}")
+        argv.extend(['--bootc',
+                '--format-version=1',
+                f'--from={args.from_image}',
+                f'--output=containers-storage:{args.to_image}'])
+        try:
+            subprocess.run(argv, check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Error executing command: {e}")
+            sys.exit(1)
 
 def run_list(args):
     d = '/' + MANIFESTDIR
@@ -190,9 +208,10 @@ if __name__ == "__main__":
     build_rootfs.set_defaults(func=run_build_rootfs)
 
     cmd_rechunk = subparsers.add_parser('rechunk', help="Generate a new container image with split, reproducible, chunked layers")
+    cmd_rechunk.add_argument("--chunkah", help="Use chunkah instead of rpm-ostree (reads rootfs from /chunkah, writes OCI archive to stdout)", action='store_true')
     cmd_rechunk.add_argument("--max-layers", help="Configure the number of output layers")
-    cmd_rechunk.add_argument("from_image", help="Operate on this image in the container storage")
-    cmd_rechunk.add_argument("to_image", help="Output a new image to the container storage")
+    cmd_rechunk.add_argument("from_image", help="Operate on this image in the container storage", nargs='?')
+    cmd_rechunk.add_argument("to_image", help="Output a new image to the container storage", nargs='?')
     cmd_rechunk.set_defaults(func=run_rechunk)
 
     cmd_list = subparsers.add_parser('list', help='List available manifests')
