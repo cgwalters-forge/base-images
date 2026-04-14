@@ -43,3 +43,6 @@ packages:
   - container-selinux
   # Needed for tpm2 bound luks
   - tpm2-tools
+  # Initramfs Clevis + TPM2 pin for LUKS auto-unlock (dracut modules wired in initramfs.yaml)
+  - clevis-dracut
+  - clevis-pin-tpm2
