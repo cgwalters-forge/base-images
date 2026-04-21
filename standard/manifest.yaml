@@ -45,8 +45,6 @@ packages:
   - python3-rpm
   # Used by admins interactively
   - man-db
-  # Content-based container layer splitting for rechunking
-  - chunkah
 
 # These are random architecture-specific packages
 packages-x86_64:
