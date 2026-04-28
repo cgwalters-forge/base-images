@@ -49,7 +49,7 @@ spec:
     value: true
   - name: build-args
     value:
-    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-42-compose:Fedora-42-updates-20260326.0@sha256:35c58382b07a89f79229c2609b0798807fc8c6b4c6925a7a9a2a4166c5a0d3d1
+    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-42-compose:Fedora-42-updates-20260428.0@sha256:08607f199d0d7b912de586d989922389563f524e69da2ca1c1bc14973fef5c87
     - MANIFEST=fedora-minimal-plus
   - name: image-expires-after
     value: 5d
@@ -61,7 +61,7 @@ spec:
   pipelineRef:
     params:
     - name: bundle
-      value: quay.io/bootc-devel/tekton-catalog/pipeline-buildah-build-bootc-multi-platform-oci-ta@sha256:2678dd50429012f562c349ad52bce30f4bba3a0f6832b874c303e418d5b8a4ae
+      value: quay.io/bootc-devel/tekton-catalog/pipeline-buildah-build-bootc-multi-platform-oci-ta@sha256:44d0e8034a19a1ced7817c117c9c15230def1f3e7941666a72a3e47919951f51
     - name: name
       value: buildah-build-bootc-multi-platform-oci-ta
     - name: kind
