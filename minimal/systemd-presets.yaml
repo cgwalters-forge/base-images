@@ -21,13 +21,15 @@ postprocess:
 
     case "$ID" in
         fedora)
-            [ "$VERSION_ID" -ge 43 ] && echo "enable bootloader-update.service" >> "$preset_file_name"
+            if [ "$VERSION_ID" -ge 43 ]; then
+                echo "enable bootloader-update.service" >> "$preset_file_name"
+            fi
             ;;
-
         centos)
-            [ "$VERSION_ID" -ge 9 ] && echo "enable bootloader-update.service" >> "$preset_file_name"
+            if [ "$VERSION_ID" -ge 9 ]; then
+                echo "enable bootloader-update.service" >> "$preset_file_name"
+            fi
             ;;
-
         *) ;;
     esac
   # Undo RPM scripts enabling units; we want the presets to be canonical
