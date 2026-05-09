@@ -43,6 +43,9 @@ packages:
   - sos
   # Make Ansible "package_facts" builtin work by default
   - python3-rpm
+  # Initramfs Clevis + TPM2 pin for LUKS auto-unlock (dracut modules wired in initramfs-full.yaml)
+  - clevis-dracut
+  - clevis-pin-tpm2
   # Used by admins interactively
   - man-db
 

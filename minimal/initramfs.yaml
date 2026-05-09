@@ -20,10 +20,6 @@ postprocess:
     # We want this for systemd-cryptsetup tpm2 locking
     add_dracutmodules+=" tpm2-tss "
     EOF
-    cat > /usr/lib/dracut/dracut.conf.d/50-bootc-clevis.conf << 'EOF'
-    # Clevis in initramfs for TPM2-bound LUKS (needs clevis-dracut, clevis-pin-tpm2)
-    add_dracutmodules+=" clevis clevis-pin-tpm2 "
-    EOF
     cat > /usr/lib/dracut/dracut.conf.d/59-altfiles.conf << 'EOF'
     # https://issues.redhat.com/browse/RHEL-49590
     # On image mode systems we use nss-altfiles for passwd and group,
