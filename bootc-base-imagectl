@@ -37,6 +37,10 @@ def run_build_rootfs(args):
         additional_pkgs = [shlex.quote(p) for p in set(args.install)]
         if len(additional_pkgs) > 0:
             override_manifest['packages'] = list(additional_pkgs)
+    if args.exclude:
+        exclude_pkgs = [shlex.quote(p) for p in set(args.exclude)]
+        if len(exclude_pkgs) > 0:
+            override_manifest['exclude-packages'] = list(exclude_pkgs)
     if args.add_dir:
         tmp_ostree_repo = tempfile.mkdtemp(dir='/var/tmp')
         subprocess.check_call(['ostree', 'init', '--repo', tmp_ostree_repo, '--mode=bare'])
@@ -194,6 +198,7 @@ if __name__ == "__main__":
     build_rootfs.add_argument("--reinject", help="Also reinject the build configurations into the target", action='store_true')
     build_rootfs.add_argument("--manifest", help="Use the specified manifest", action='store', default='default')
     build_rootfs.add_argument("--install", help="Add a package", action='append', default=[], metavar='PACKAGE')
+    build_rootfs.add_argument("--exclude", help="Exclude a package", action='append', default=[], metavar='PACKAGE')
     build_rootfs.add_argument("--cachedir", help="Cache repo metadata and RPMs in specified directory", action='store', default='')
     build_rootfs.add_argument("--add-dir", help='Copy dir contents into the target', action='append', default=[], metavar='DIR')
     build_rootfs.add_argument("--no-docs", help="Don't install documentation", action='store_true')
