@@ -1,0 +1,18 @@
+#!/bin/bash
+set -xeuo pipefail
+# Verify our custom tmpfiles.d configs by actually running systemd-tmpfiles
+# against a temporary root and checking the expected paths are created.
+# Workaround for https://github.com/konflux-ci/build-tasks-dockerfiles/pull/243
+
+tmproot=$(mktemp -d)
+trap 'rm -rf "${tmproot}"' EXIT
+
+systemd-tmpfiles --create --root="${tmproot}" \
+    /usr/lib/tmpfiles.d/bootc-base-rpmstate.conf \
+    /usr/lib/tmpfiles.d/konflux-buildinfo-contentsets.conf
+
+test -d "${tmproot}/var/lib/rpm-state"
+test -d "${tmproot}/var/roothome/buildinfo"
+test -d "${tmproot}/var/roothome/buildinfo/content_manifests"
+test -f "${tmproot}/var/roothome/buildinfo/content_manifests/content-sets.json"
+test -f "${tmproot}/var/roothome/buildinfo/labels.json"
