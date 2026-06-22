@@ -48,8 +48,11 @@ def run_build_rootfs(args):
         override_manifest['ostree-override-layers'] = []
 
         for dir in args.add_dir:
+            print(f"Processing --add-dir for {dir}")
             base = os.path.basename(dir)
             abs = os.path.realpath(dir)
+            if not os.path.exists(abs):
+                raise Exception(f"add dir directory not found: {abs}")
             # capture output to hide commit digest printed
             subprocess.check_output(['ostree', 'commit', '--repo', tmp_ostree_repo, '-b', f'overlay/{base}', abs,
                                      '--owner-uid=0', '--owner-gid=0', '--no-xattrs', '--mode-ro-executables'])
