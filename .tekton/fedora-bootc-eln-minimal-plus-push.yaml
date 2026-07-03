@@ -5,13 +5,13 @@ metadata:
     build.appstudio.openshift.io/repo: https://gitlab.com/fedora/bootc/base-images/-/tree/{{revision}}
     build.appstudio.redhat.com/commit_sha: '{{revision}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
-    pipelinesascode.tekton.dev/cancel-in-progress: "true"
+    pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: |
       (
-        (event == "push" && target_branch.startsWith("renovate/"))
+        (event == "push" && target_branch == "main")
       ) && (
-        ".tekton/fedora-bootc-eln-standard-renovate-push.yaml".pathChanged() ||
+        ".tekton/fedora-bootc-eln-minimal-plus-push.yaml".pathChanged() ||
         "Containerfile".pathChanged() ||
         "bootc-base-imagectl".pathChanged() ||
         "install-manifests".pathChanged() ||
@@ -24,15 +24,14 @@ metadata:
         "minimal-plus/***".pathChanged() ||
         "minimal.yaml".pathChanged() ||
         "minimal/***".pathChanged()
-      ) && true == false
+      )
     test.appstudio.openshift.io/comment_strategy: "disable_all"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: fedora-bootc-eln
-    appstudio.openshift.io/component: fedora-bootc-eln-standard
+    appstudio.openshift.io/component: fedora-bootc-eln-minimal-plus
     pipelines.appstudio.openshift.io/type: build
-    release.appstudio.openshift.io/auto-release: "false"
-  name: fedora-bootc-eln-standard-renovate-on-push
+  name: fedora-bootc-eln-minimal-plus-on-push
 spec:
   params:
   - name: git-url
@@ -55,10 +54,8 @@ spec:
     value:
     - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-eln-compose:Fedora-ELN-20260317.n.0@sha256:0000000000000000000000000000000000000000000000000000000000000001
     - MANIFEST=fedora-eln
-  - name: image-expires-after
-    value: 5d
   - name: output-image
-    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-eln-standard:{{revision}}
+    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-eln-minimal-plus:{{revision}}
   - name: labels
     value:
       - org.opencontainers.image.version=eln
@@ -74,4 +71,4 @@ spec:
   timeouts:
     pipeline: 6h
   taskRunTemplate:
-    serviceAccountName: build-pipeline-fedora-bootc-eln-standard
+    serviceAccountName: build-pipeline-fedora-bootc-eln-minimal-plus
