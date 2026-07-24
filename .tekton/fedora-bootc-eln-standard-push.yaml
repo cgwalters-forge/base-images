@@ -52,7 +52,7 @@ spec:
     value: true
   - name: build-args
     value:
-    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-eln-compose:Fedora-ELN-20260317.n.0@sha256:0000000000000000000000000000000000000000000000000000000000000001
+    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-eln-compose:Fedora-eln-20260724.n.1@sha256:270fac959f81d1bf507b61889bc386dde444d5de0bd30ef258a5557fb00eb9ff
     - MANIFEST=fedora-eln
   - name: output-image
     value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-eln-standard:{{revision}}
@@ -62,7 +62,7 @@ spec:
   pipelineRef:
     params:
     - name: bundle
-      value: quay.io/bootc-devel/tekton-catalog/pipeline-buildah-build-bootc-multi-platform-oci-ta@sha256:d29a4d1bc4f331a327e23d96ba48e4cdd2d8e732078faf6970dd9657e9b817e6
+      value: quay.io/bootc-devel/tekton-catalog/pipeline-buildah-build-bootc-multi-platform-oci-ta@sha256:c587d9400c89e21225fee03a080dcb0816919d39770b6af0cd6f990c7f8404b8
     - name: name
       value: buildah-build-bootc-multi-platform-oci-ta
     - name: kind
