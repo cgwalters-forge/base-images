@@ -16,6 +16,12 @@ for image in minimal standard minimal-plus iot; do
     # And the legacy `fedora-` prefixed names
     cp -a fedora-$image.yaml $manifestdir/
 done
+# ELN is rawhide-only and should be removed when stable branches are created
+# (manually remove eln/ directory and fedora-eln.yaml when branching for new releases)
+if [ -d eln ]; then
+    cp -a eln $manifestdir/
+    cp -a fedora-eln.yaml $manifestdir/
+fi
 # Set the default
 ln -s fedora-standard.yaml $manifestdir/default.yaml
 # And install dependency manifests

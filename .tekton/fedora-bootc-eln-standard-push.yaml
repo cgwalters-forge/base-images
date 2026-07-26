@@ -1,0 +1,74 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://gitlab.com/fedora/bootc/base-images/-/tree/{{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/cancel-in-progress: "false"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-cel-expression: |
+      (
+        (event == "push" && target_branch == "main")
+      ) && (
+        ".tekton/fedora-bootc-eln-standard-push.yaml".pathChanged() ||
+        "Containerfile".pathChanged() ||
+        "bootc-base-imagectl".pathChanged() ||
+        "install-manifests".pathChanged() ||
+        "fedora-includes/eln.yaml".pathChanged() ||
+        "fedora-eln.yaml".pathChanged() ||
+        "eln/***".pathChanged() ||
+        "standard.yaml".pathChanged() ||
+        "standard/***".pathChanged() ||
+        "minimal-plus.hidden.yaml".pathChanged() ||
+        "minimal-plus/***".pathChanged() ||
+        "minimal.yaml".pathChanged() ||
+        "minimal/***".pathChanged()
+      )
+    test.appstudio.openshift.io/comment_strategy: "disable_all"
+  creationTimestamp: null
+  labels:
+    appstudio.openshift.io/application: fedora-bootc-eln
+    appstudio.openshift.io/component: fedora-bootc-eln-standard
+    pipelines.appstudio.openshift.io/type: build
+  name: fedora-bootc-eln-standard-on-push
+spec:
+  params:
+  - name: git-url
+    value: '{{source_url}}'
+  - name: revision
+    value: '{{revision}}'
+  - name: build-platforms
+    value:
+    - linux/amd64
+    - linux/arm64
+    - linux/ppc64le
+    - linux/s390x
+  - name: dockerfile
+    value: Containerfile
+  - name: path-context
+    value: .
+  - name: privileged-nested
+    value: true
+  - name: build-args
+    value:
+    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-eln-compose:Fedora-eln-20260724.n.1@sha256:270fac959f81d1bf507b61889bc386dde444d5de0bd30ef258a5557fb00eb9ff
+    - MANIFEST=fedora-eln
+  - name: output-image
+    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-eln-standard:{{revision}}
+  - name: labels
+    value:
+      - org.opencontainers.image.version=eln
+  pipelineRef:
+    params:
+    - name: bundle
+      value: quay.io/bootc-devel/tekton-catalog/pipeline-buildah-build-bootc-multi-platform-oci-ta@sha256:c587d9400c89e21225fee03a080dcb0816919d39770b6af0cd6f990c7f8404b8
+    - name: name
+      value: buildah-build-bootc-multi-platform-oci-ta
+    - name: kind
+      value: pipeline
+    resolver: bundles
+  timeouts:
+    pipeline: 6h
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-fedora-bootc-eln-standard

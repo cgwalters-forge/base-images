@@ -1,0 +1,8 @@
+metadata:
+  summary: |
+    Standard bootc base image for Enterprise Linux Next (ELN).
+    This manifest is the source for the image published as fedora-eln.
+    ELN is the Fedora package set (rawhide sources, ELN buildroot/compose).
+
+include:
+  - ../standard/manifest.yaml
