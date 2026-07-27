@@ -52,7 +52,7 @@ spec:
     value: true
   - name: build-args
     value:
-    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-eln-compose:Fedora-eln-20260724.n.1@sha256:270fac959f81d1bf507b61889bc386dde444d5de0bd30ef258a5557fb00eb9ff
+    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-eln-compose:Fedora-eln-20260726.n.0@sha256:09cd630843bf26befae377e3d957c06d9036ef220c5974c61d97d9bc9585a799
     - MANIFEST=fedora-eln
   - name: output-image
     value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-eln-standard:{{revision}}
