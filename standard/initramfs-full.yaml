@@ -7,7 +7,14 @@ postprocess:
     cat > /usr/lib/dracut/dracut.conf.d/30-bootc-standard.conf << 'EOF'
     add_dracutmodules+=" lvm crypt fips "
     EOF
-    cat > /usr/lib/dracut/dracut.conf.d/50-bootc-clevis.conf << 'EOF'
-    # Clevis in initramfs for TPM2-bound LUKS (needs clevis-dracut, clevis-pin-tpm2)
-    add_dracutmodules+=" clevis clevis-pin-tpm2 "
+    # Clevis in initramfs for LUKS auto-unlock.
+    # clevis-pin-tpm2 is only on x86_64/aarch64 (TPM2 hardware arches).
+    if test -x /usr/bin/clevis-pin-tpm2; then
+      cat > /usr/lib/dracut/dracut.conf.d/50-bootc-clevis.conf << 'EOF'
+      add_dracutmodules+=" clevis clevis-pin-tpm2 "
     EOF
+    else
+      cat > /usr/lib/dracut/dracut.conf.d/50-bootc-clevis.conf << 'EOF'
+      add_dracutmodules+=" clevis "
+    EOF
+    fi

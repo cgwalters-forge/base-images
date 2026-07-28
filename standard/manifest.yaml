@@ -43,9 +43,8 @@ packages:
   - sos
   # Make Ansible "package_facts" builtin work by default
   - python3-rpm
-  # Initramfs Clevis + TPM2 pin for LUKS auto-unlock (dracut modules wired in initramfs-full.yaml)
+  # Initramfs Clevis for LUKS auto-unlock (dracut modules wired in initramfs-full.yaml)
   - clevis-dracut
-  - clevis-pin-tpm2
   # Used by admins interactively
   - man-db
 
@@ -53,6 +52,8 @@ packages:
 packages-x86_64:
   - irqbalance
   - WALinuxAgent-udev
+  # TPM2 pin for Clevis LUKS auto-unlock
+  - clevis-pin-tpm2
 packages-ppc64le:
   - irqbalance
   - librtas
@@ -61,6 +62,8 @@ packages-ppc64le:
 packages-aarch64:
   - irqbalance
   - WALinuxAgent-udev
+  # TPM2 pin for Clevis LUKS auto-unlock
+  - clevis-pin-tpm2
 
 # Things we don't expect to ship on the host.  We currently
 # have recommends: false so these could only come in via
