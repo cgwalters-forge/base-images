@@ -1,0 +1,3 @@
+add-files:
+  - - 20-rhel.toml
+    - /usr/lib/bootc/install/20-rhel.toml

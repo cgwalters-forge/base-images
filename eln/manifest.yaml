@@ -6,3 +6,4 @@ metadata:
 
 include:
   - ../standard/manifest.yaml
+  - bootc-install.yaml
