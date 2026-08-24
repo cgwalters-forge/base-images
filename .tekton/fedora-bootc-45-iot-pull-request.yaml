@@ -4,14 +4,15 @@ metadata:
   annotations:
     build.appstudio.openshift.io/repo: https://gitlab.com/fedora/bootc/base-images/-/tree/{{revision}}
     build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
-    pipelinesascode.tekton.dev/cancel-in-progress: "false"
+    pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: |
       (
-        (event == "push" && target_branch == "main")
+        (event == "pull_request" && target_branch == "main")
       ) && (
-        ".tekton/fedora-bootc-rawhide-standard-push.yaml".pathChanged() ||
+        ".tekton/fedora-bootc-45-iot-pull-request.yaml".pathChanged() ||
         "Containerfile".pathChanged() ||
         "bootc-base-imagectl".pathChanged() ||
         "install-manifests".pathChanged() ||
@@ -20,16 +21,16 @@ metadata:
         "minimal/***".pathChanged() ||
         "minimal-plus.hidden.yaml".pathChanged() ||
         "minimal-plus/***".pathChanged() ||
-        "standard.yaml".pathChanged() ||
-        "standard/***".pathChanged()
+        "iot.yaml".pathChanged() ||
+        "iot/***".pathChanged()
       )
     test.appstudio.openshift.io/comment_strategy: "disable_all"
   creationTimestamp: null
   labels:
-    appstudio.openshift.io/application: fedora-bootc-rawhide
-    appstudio.openshift.io/component: fedora-bootc-rawhide-standard
+    appstudio.openshift.io/application: fedora-bootc-45
+    appstudio.openshift.io/component: fedora-bootc-45-iot
     pipelines.appstudio.openshift.io/type: build
-  name: fedora-bootc-rawhide-standard-on-push
+  name: fedora-bootc-45-iot-on-pull-request
 spec:
   params:
   - name: git-url
@@ -40,8 +41,6 @@ spec:
     value:
     - linux/amd64
     - linux/arm64
-    - linux/ppc64le
-    - linux/s390x
   - name: dockerfile
     value: Containerfile
   - name: path-context
@@ -50,17 +49,19 @@ spec:
     value: true
   - name: build-args
     value:
-    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-rawhide-compose:Fedora-Rawhide-20260824.n.0@sha256:2bf25f551a2d4ed7291a8c1493d4c64384d060c2f193798b0d105323a37c6ba2
-    - MANIFEST=fedora-standard
+    - REPOS_IMAGE=quay.io/bootc-devel/fedora-bootc-45-compose:Fedora-45-20260821.n.0@sha256:55b3460339b8c7aa0a2511e33c623310e17b16118764011059b2e8f35c5bedaf
+    - MANIFEST=fedora-iot
+  - name: image-expires-after
+    value: 5d
   - name: output-image
-    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-rawhide-standard:{{revision}}
+    value: quay.io/konflux-fedora/bootc-tenant/fedora-bootc-45-iot:on-pr-{{revision}}
   - name: labels
     value:
-      - org.opencontainers.image.version=46
+      - org.opencontainers.image.version=45
   pipelineRef:
     params:
     - name: bundle
-      value: quay.io/bootc-devel/tekton-catalog/pipeline-buildah-build-bootc-multi-platform-oci-ta@sha256:9eb1decf91e0d678a613f7d4767091c05b37bec8a02163087254328f1e848c51
+      value: quay.io/bootc-devel/tekton-catalog/pipeline-buildah-build-bootc-multi-platform-oci-ta@sha256:44d0e8034a19a1ced7817c117c9c15230def1f3e7941666a72a3e47919951f51
     - name: name
       value: buildah-build-bootc-multi-platform-oci-ta
     - name: kind
@@ -69,4 +70,4 @@ spec:
   timeouts:
     pipeline: 6h
   taskRunTemplate:
-    serviceAccountName: build-pipeline-fedora-bootc-rawhide-standard
+    serviceAccountName: build-pipeline-fedora-bootc-45-iot
