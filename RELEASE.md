@@ -234,18 +234,17 @@ Add package rules for the new version in `renovate.json`. See the existing rules
 **Repository:** https://gitlab.com/fedora/infrastructure/konflux/tenants-config
 
 ```bash
-cd cluster/kfluxfedorap01/bootc-tenant/applications/fedora-bootc/
+cd clusters/kflux-fedora-01/tenants/bootc-tenant/applications/fedora-bootc/
 NEW_RELEASE=44
 
 # Copy from rawhide
 cp -r rawhide $NEW_RELEASE
 
 # Update version references
-sed -i "s/rawhide/$NEW_RELEASE/g" $NEW_RELEASE/**/*.yaml
 sed -i "s/compose-rawhide-id/compose-branched-id/" $NEW_RELEASE/releaseplans/release-to-quay-io/kustomization.yaml
+find "${NEW_RELEASE}/" -type f | xargs sed -i "s/rawhide/$NEW_RELEASE/g"
 ```
 
-#### Step 5: Register the New Version (tenants-config repo)
 
 Add the new version to `fedora-bootc/kustomization.yaml`:
 
@@ -258,6 +257,8 @@ resources:
   - "43"
   - "42"
 ```
+
+See [MR !237](https://gitlab.com/fedora/infrastructure/konflux/tenants-config/-/merge_requests/237) for reference (F45 addition).
 
 ### Removing an EOL Fedora Version from Konflux
 
