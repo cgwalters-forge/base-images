@@ -11,6 +11,8 @@
     "- Fedora 43 REPOS_IMAGE: at any time",
     "- Fedora 44 bootc-pipeline: 2-5 AM UTC daily",
     "- Fedora 44 REPOS_IMAGE: at any time",
+    "- Fedora 45 bootc-pipeline: 2-5 AM UTC daily",
+    "- Fedora 45 REPOS_IMAGE: at any time",
     "- Rawhide bootc-pipeline: 2-5 AM UTC daily",
     "- Rawhide REPOS_IMAGE: at any time",
     "",
@@ -63,11 +65,11 @@
   "packageRules": [
     {
       "description": [
-        "Disable REPOS_IMAGE updates for 44-iot and rawhide-iot tekton files",
+        "Disable REPOS_IMAGE updates for 44-iot, 45-iot and rawhide-iot tekton files",
         "until we fix https://gitlab.com/fedora/bootc/base-images/-/issues/74"
       ],
       "matchManagers": ["custom.regex", "tekton"],
-      "matchFileNames": [".tekton/*-44-iot-*", ".tekton/*-rawhide-iot-*"],
+      "matchFileNames": [".tekton/*-44-iot-*", ".tekton/*-45-iot-*", ".tekton/*-rawhide-iot-*"],
       "enabled": false
     },
     {
@@ -122,6 +124,35 @@
       "groupSlug": "fedora-44-repos-image",
       "branchPrefix": "renovate/fedora-44/",
       "commitMessageTopic": "Fedora 44 REPOS_IMAGE",
+      "schedule": ["at any time"],
+      "recreateWhen": "always",
+      "rebaseWhen": "never",
+      "additionalBranchPrefix": "",
+      "automerge": true
+    },
+    {
+      "matchManagers": ["tekton"],
+      "matchPackageNames": ["/quay.io/bootc-devel/tekton-catalog/"],
+      "matchFileNames": [".tekton/fedora-bootc-45-*"],
+      "groupName": "Fedora 45 bootc-pipeline",
+      "groupSlug": "fedora-45-bootc-pipeline",
+      "branchPrefix": "renovate/fedora-45/",
+      "commitMessageTopic": "Fedora 45 bootc build pipeline",
+      "schedule": ["after 2am and before 5am"],
+      "timezone": "UTC",
+      "recreateWhen": "always",
+      "rebaseWhen": "always",
+      "additionalBranchPrefix": "",
+      "automerge": true
+    },
+    {
+      "matchManagers": ["custom.regex"],
+      "matchPackageNames": ["/quay.io/bootc-devel/fedora-bootc-45-compose/"],
+      "matchFileNames": [".tekton/fedora-bootc-45-*"],
+      "groupName": "Fedora 45 REPOS_IMAGE",
+      "groupSlug": "fedora-45-repos-image",
+      "branchPrefix": "renovate/fedora-45/",
+      "commitMessageTopic": "Fedora 45 REPOS_IMAGE",
       "schedule": ["at any time"],
       "recreateWhen": "always",
       "rebaseWhen": "never",
