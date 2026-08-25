@@ -1,13 +1,12 @@
-# This test case exercises using the fedora-bootc image as a builder
-# to generate a minimal target image derived from CentOS Stream 10 content,
-# and then further extends it in a secondary phase.
-FROM quay.io/fedora/fedora-bootc:rawhide as repos
+# This test case exercises using the fedora-bootc image as a builder to
+# generate a minimal target image, and then further extends it in a secondary
+# phase.
 
 # This is intentionally a locally built image
 FROM localhost/fedora-bootc as builder
-RUN --mount=type=bind,from=repos,src=/,dst=/repos,rw <<EORUN
+RUN <<EORUN
 echo -e '--install\nltrace' > args.txt
-/usr/libexec/bootc-base-imagectl --args-file args.txt build-rootfs --manifest=standard/manifest /repos /target-rootfs
+/usr/libexec/bootc-base-imagectl --args-file args.txt build-rootfs --manifest=standard/manifest /target-rootfs
 EORUN
 
 # This pulls in the rootfs generated in the previous step

@@ -1,15 +1,14 @@
 # This test case exercises --sysusers.
-FROM quay.io/fedora/fedora-bootc:rawhide as repos
 
 # This is intentionally a locally built image
 FROM localhost/fedora-bootc as builder
-RUN --mount=type=bind,from=repos,src=/,dst=/repos,rw <<EORUN
+RUN <<EORUN
 mkdir -p overlay/usr/lib/sysusers.d
 cat > overlay/usr/lib/sysusers.d/00-chrony.conf <<EOF
 g chrony 888
 u chrony 888:888 - - -
 EOF
-/usr/libexec/bootc-base-imagectl build-rootfs --manifest=standard/manifest /repos /target-rootfs --sysusers --add-dir overlay
+/usr/libexec/bootc-base-imagectl build-rootfs --manifest=standard/manifest /target-rootfs --sysusers --add-dir overlay
 EORUN
 
 # This pulls in the rootfs generated in the previous step
