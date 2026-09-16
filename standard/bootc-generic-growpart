@@ -14,9 +14,14 @@ if ! test -d "${syspath}"; then
     echo "failed to find backing device ${syspath}"; exit 1
 fi
 
-
-
-# Note that we expect that the rootfs is on a partition
+# Only partitions have a "partition" attribute in sysfs.  A rootfs on an
+# mdraid array, on a device-mapper node, or directly on a whole disk has
+# nothing here for us to grow, and growing those is a different
+# operation.  Skip rather than fail, so that the unit does not leave an
+# otherwise healthy system "degraded".
+if ! test -f "${syspath}"/partition; then
+    echo "Not growing ${backing_device}: not a partition"; exit 0
+fi
 partition=$(cat "${syspath}"/partition)
 
 # Walk up to find the parent blockdev
