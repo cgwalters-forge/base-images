@@ -17,6 +17,12 @@ postprocess:
     set -xeuo pipefail
     source /usr/lib/os-release
 
+    # bootloader-update.service comes with bootupd, which isn't installed
+    # with `--bootloader=systemd-boot`.
+    if ! test -f /usr/lib/systemd/system/bootloader-update.service; then
+        exit 0
+    fi
+
     preset_file_name=/usr/lib/systemd/system-preset/85-bootc-bootloader-update.preset
 
     case "$ID" in

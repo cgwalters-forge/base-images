@@ -1,0 +1,13 @@
+# systemd-boot instead of bootupd/shim/grub2, selected with
+# `bootc-base-imagectl build-rootfs --bootloader=systemd-boot`.
+# The binary is unsigned: the image builder is expected to sign it
+# (e.g. with systemd-sbsign) for Secure Boot. Such an image can only be
+# installed with bootc's composefs backend.
+packages-aarch64:
+  - systemd-boot-unsigned
+packages-x86_64:
+  - systemd-boot-unsigned
+
+# bootc Recommends bootupd, which tiers with `recommends: true` would pull in.
+exclude-packages:
+  - bootupd
