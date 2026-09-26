@@ -1,0 +1,41 @@
+# This test case exercises --bootloader=systemd-boot.
+
+# This is intentionally a locally built image
+FROM localhost/fedora-bootc as builder
+# Old names and unknown tools or components are rejected up front
+RUN for v in grub systemd bootupd bootupd:grub systemd-boot:shim; do \
+        if /usr/libexec/bootc-base-imagectl build-rootfs --bootloader="$v" /target-rootfs 2>err.txt; then \
+            echo "error: --bootloader=$v was accepted" 1>&2; exit 1; \
+        fi; \
+        grep -q 'supported: bootupd:grub+shim, systemd-boot' err.txt; \
+    done; rm -f err.txt
+RUN /usr/libexec/bootc-base-imagectl build-rootfs --manifest=standard/manifest /target-rootfs --bootloader=systemd-boot --sysusers
+
+# This pulls in the rootfs generated in the previous step
+FROM scratch
+COPY --from=builder /target-rootfs/ /
+RUN <<EORUN
+set -xeuo pipefail
+
+rpm -q systemd-boot-unsigned
+unwanted=$(rpm -qa --qf '%{NAME}\n' 'bootupd*' 'grub2*' 'shim*' efibootmgr || :)
+if test -n "$unwanted"; then
+    echo "error: should not be installed with --bootloader=systemd-boot:" $unwanted 1>&2
+    exit 1
+fi
+if test "$(uname -m)" = x86_64; then
+    rpm -q microcode_ctl
+fi
+test ! -e /usr/lib/systemd/system-preset/85-bootc-bootloader-update.preset
+
+# --sysusers also sets a manifest variable; check it wasn't dropped
+getent passwd nobody | grep :65534:65534:
+
+# Cleanup and lint
+rm -rf /var/log /var/cache/* /var/lib/dnf
+bootc container lint
+EORUN
+LABEL containers.bootc 1
+ENV container=oci
+STOPSIGNAL SIGRTMIN+3
+CMD ["/sbin/init"]

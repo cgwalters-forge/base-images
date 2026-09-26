@@ -14,6 +14,39 @@ import tempfile
 ARCH = os.uname().machine
 MANIFESTDIR = 'usr/share/doc/bootc-base-imagectl/manifests'
 
+# build-rootfs --bootloader takes `<tool>[:<component>+<component>...]`, which
+# leaves room for other tools and component sets later. Keys are the tools
+# (also the manifest's `bootloader` variable values); values are the exact
+# components each one takes and the architectures it is supported on. Without
+# --bootloader the manifest default applies: bootupd with each architecture's
+# own set (grub2 without shim on ppc64le, zipl on s390x).
+BOOTUPD = 'bootupd'
+SYSTEMD_BOOT = 'systemd-boot'
+BOOTLOADERS = {
+    BOOTUPD: ({'grub', 'shim'}, ['x86_64', 'aarch64', 'riscv64']),
+    SYSTEMD_BOOT: (set(), ['x86_64', 'aarch64']),
+}
+
+def format_bootloader(tool):
+    components, _ = BOOTLOADERS[tool]
+    return f"{tool}:{'+'.join(sorted(components))}" if components else tool
+
+def parse_bootloader(value):
+    """
+    Parses a --bootloader value, returning the manifest `bootloader` variable value.
+    """
+    supported = ', '.join(format_bootloader(t) for t in BOOTLOADERS)
+    tool, sep, components = value.partition(':')
+    if tool not in BOOTLOADERS:
+        raise argparse.ArgumentTypeError(f"unknown bootloader tool '{tool}' (supported: {supported})")
+    components = set(components.split('+')) if sep else set()
+    expected, arches = BOOTLOADERS[tool]
+    if components != expected:
+        raise argparse.ArgumentTypeError(f"unsupported components for {tool} in '{value}' (supported: {supported})")
+    if ARCH not in arches:
+        raise argparse.ArgumentTypeError(f"'{value}' is not supported on {ARCH} (supported on: {', '.join(arches)})")
+    return tool
+
 def run_build_rootfs(args):
     """
     Regenerates a base image using a build configuration.
@@ -66,7 +99,9 @@ def run_build_rootfs(args):
     if args.sysusers:
         override_manifest['sysusers'] = 'compose-forced'
         passwd_mode = 'nobody' if args.nobody_99 else 'none'
-        override_manifest['variables'] = {'passwd_mode': passwd_mode}
+        override_manifest.setdefault('variables', {})['passwd_mode'] = passwd_mode
+    if args.bootloader:
+        override_manifest.setdefault('variables', {})['bootloader'] = args.bootloader
     if args.repo:
         override_manifest['repos'] = args.repo
 
@@ -208,6 +243,7 @@ if __name__ == "__main__":
     build_rootfs.add_argument("--recommends", help="Whether to install recommended packages", action='store_true')
     build_rootfs.add_argument("--no-initramfs", help="Whether to generate an initramfs for the roots", action='store_true')
     build_rootfs.add_argument("--sysusers", help="Run systemd-sysusers instead of injecting hardcoded passwd/group entries", action='store_true')
+    build_rootfs.add_argument("--bootloader", help="Bootloader to install: bootupd:grub+shim, or systemd-boot (unsigned, without bootupd, grub or shim; composefs backend only). Default: bootupd with the architecture's bootloader", type=parse_bootloader, metavar='TOOL[:COMPONENTS]')
     build_rootfs.add_argument("--nobody-99", help=argparse.SUPPRESS, action='store_true')
     build_rootfs.add_argument("--repo", help="Enable specific repositories only", action='append', default=[], metavar='REPO')
     build_rootfs.add_argument("--lock", help="Lock package to specific version; can be NEVRA or NEVR", action='append', default=[], metavar='NEVRA')
