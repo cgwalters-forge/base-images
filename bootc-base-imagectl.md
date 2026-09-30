@@ -56,6 +56,30 @@ to be editable directly.
 To emphasize: the implementation of this command (especially the configuration
 files that it reads) are subject to change.
 
+### Choosing the bootloader
+
+By default the target gets the bootloader managed by
+[bootupd](https://github.com/coreos/bootupd): shim and grub2 on
+most architectures; `--bootloader=bootupd:grub+shim` asks for that
+explicitly. `--bootloader=systemd-boot` installs systemd-boot instead,
+and leaves out bootupd, shim, grub2 and efibootmgr:
+
+```
+/usr/libexec/bootc-base-imagectl build-rootfs --manifest=standard --bootloader=systemd-boot /target-rootfs
+```
+
+This is meant for sealed images, which boot a signed Unified Kernel
+Image (UKI) with systemd-boot. Note:
+
+- It is supported on x86_64 and aarch64 only (`bootupd:grub+shim` also
+  on riscv64).
+- The systemd-boot binary comes from `systemd-boot-unsigned`, so for
+  Secure Boot the image build has to sign it (e.g. with `systemd-sbsign`)
+  and build and sign the UKI itself; see `bootc container ukify`.
+- Without bootupd, the image can only be installed with bootc's
+  composefs backend. Installs with the ostree backend (including
+  via bootc-image-builder and Anaconda) fail.
+
 ## Using bootc-base-imagectl rechunk
 
 This operation is strongly related to `build-rootfs` but is also orthogonal;

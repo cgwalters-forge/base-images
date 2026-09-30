@@ -45,11 +45,13 @@ test: build
     #!/usr/bin/env bash
     set -xeuo pipefail
     {{_build_cmd}} -f tests/rootfs/Dockerfile -t localhost/test --from {{_tag}} tests/rootfs
-    # The derive and sysusers tests only apply to the standard tier
+    # The derive, sysusers and bootloader tests only apply to the standard tier
     if [ "{{tier}}" = "standard" ]; then
         {{_build_cmd}} -f tests/Containerfile.test-derive --no-cache \
             -t localhost/fedora-bootc-derived {{priv_args}} {{builder_extra}} tests
         {{_build_cmd}} -f tests/Containerfile.test-sysusers --no-cache \
+            -t localhost/fedora-bootc-derived {{priv_args}} {{builder_extra}} tests
+        {{_build_cmd}} -f tests/Containerfile.test-bootloader-systemd --no-cache \
             -t localhost/fedora-bootc-derived {{priv_args}} {{builder_extra}} tests
     fi
 

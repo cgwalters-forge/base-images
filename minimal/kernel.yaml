@@ -2,6 +2,9 @@
 packages:
  - kernel
 
+packages-x86_64:
+  - microcode_ctl
+
 exclude-packages:
   - kernel-debug
   - kernel-debug-core
